@@ -1,6 +1,6 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "build/index.js",
   "types": "types/index.d.ts",
@@ -101,14 +101,14 @@
   },
   "dependencies": {
     "inversify": "^5.1.1",
-    "libavoid-js": "file:../Hnatiuj.Adaptagrams",
+    "libavoid-js": "^0.1.2",
     "path-browserify": "^1.0.1",
     "reflect-metadata": "^0.1.13",
-    "sprotty": "file:../sprotty"
+    "sprotty": "^0.9.2"
   },
   "browser": {
     "fs": false,
     "path": false,
     "os": false
-  }  
+  }
 }
