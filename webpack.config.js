@@ -25,7 +25,7 @@ module.exports = {
   mode: "production",
   devtool: 'source-map',
   target: 'node',
-  entry: './src/lib/index.ts',
+  entry: './src/index.ts',
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'build'),

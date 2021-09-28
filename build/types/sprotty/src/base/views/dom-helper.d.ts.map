@@ -1,1 +1,0 @@
-{"version":3,"file":"dom-helper.d.ts","sourceRoot":"","sources":["../../../../../../../sprotty/src/base/views/dom-helper.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;kFAckF;AAKlF,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAC;AAEhD,qBACa,SAAS;IAEW,OAAO,CAAC,aAAa,CAAgB;IAElE,OAAO,CAAC,SAAS;IAMjB,wBAAwB,CAAC,OAAO,EAAE,aAAa,GAAG,MAAM;IAIxD,wBAAwB,CAAC,OAAO,EAAE,OAAO,GAAG,MAAM;CAIrD"}

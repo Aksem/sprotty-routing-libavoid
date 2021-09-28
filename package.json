@@ -1,9 +1,9 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "build/index.js",
-  "types": "build/types/index.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "start": "webpack serve --config webpack.config.demo.js",
     "build": "webpack && tsc",
@@ -58,7 +58,7 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "4.0.0-beta.3"
+    "webpack-dev-server": "4.2.0"
   },
   "jest": {
     "roots": [
@@ -66,8 +66,8 @@
     ],
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
-      "!src/lib/index.js",
-      "!src/demo/index.js",
+      "!src/index.js",
+      "!demo/index.js",
       "!src/utils/**",
       "!**/tests/**"
     ],
@@ -105,5 +105,10 @@
     "path-browserify": "^1.0.1",
     "reflect-metadata": "^0.1.13",
     "sprotty": "file:../sprotty"
-  }
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  }  
 }
