@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Avoid as AvoidInterface, AvoidLib } from "libavoid-js";
 import {
   SRoutableElement,
@@ -16,6 +16,7 @@ import {
   SChildElement,
   SConnectableElement,
   SParentElement,
+  AnchorComputerRegistry,
 } from "sprotty";
 
 export type AvoidRouteEdge = {
@@ -45,6 +46,8 @@ export class LibavoidRouter
   extends LinearEdgeRouter
   implements IMultipleEdgesRouter
 {
+  @inject(AnchorComputerRegistry) anchorRegistry: AnchorComputerRegistry;
+
   avoidRouter: AvoidInterface["Router"];
   avoidRoutes: AvoidRoutes;
   renderedTimes = 0;
