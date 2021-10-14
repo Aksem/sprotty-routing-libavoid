@@ -1,13 +1,11 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "build/index.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "start": "webpack serve --config webpack.config.demo.js",
-    "build": "webpack && tsc",
-    "build:demo": "webpack --config webpack.config.demo.js",
+    "build": "tsc",
     "test": "jest --silent",
     "coverage": "npm run test -- --coverage",
     "prepare": "npm run build",
@@ -55,10 +53,7 @@
     "terser-webpack-plugin": "^5.1.3",
     "ts-loader": "^6.1.0",
     "typescript": "^3.8.3",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.38.1",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "4.2.0"
+    "url-loader": "^4.1.1"
   },
   "jest": {
     "roots": [
