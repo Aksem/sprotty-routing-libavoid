@@ -34,35 +34,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import initAvoid from './generated/libavoid.js';
-// import initAvoid from '../examples/lib/libavoid.js';
-export var AvoidLib = {
-    avoidLib: undefined,
-    load: function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (!!this.avoidLib) return [3 /*break*/, 2];
-                        _a = this;
-                        return [4 /*yield*/, initAvoid()];
-                    case 1:
-                        _a.avoidLib = _b.sent();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        console.log('Avoid library is already initialized');
-                        _b.label = 3;
-                    case 3: return [2 /*return*/];
-                }
-            });
+import { AvoidLib } from "libavoid-js";
+import { LibavoidRouter } from "./libavoid-router";
+export function load() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, AvoidLib.load()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
-    },
-    getInstance: function () {
-        if (!this.avoidLib) {
-            throw new Error('Avoid library should be initialized before using');
-        }
-        return this.avoidLib;
-    }
-};
+    });
+}
+export { LibavoidRouter };
 //# sourceMappingURL=index.js.map

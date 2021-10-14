@@ -1,10 +1,8 @@
-import { AvoidLib } from '../../Hnatiuj.Adaptagrams/';
-import { LibavoidRouter } from './libavoid-router';
+import { AvoidLib } from "libavoid-js";
+import { LibavoidRouter } from "./libavoid-router";
 
 export async function load() {
-    console.log(0);
-    await AvoidLib.load();
-    console.log(1);
+  await AvoidLib.load();
 }
 
 export { LibavoidRouter };

@@ -1,5 +1,5 @@
 {
-    "extends": "sprotty/configs/base.tsconfig.json",
+    "extends": "./base.tsconfig.json",
     "compilerOptions": {
       "noImplicitAny": true,
       "outDir": "build/types",
@@ -14,5 +14,5 @@
       "moduleResolution": "node"
     },
     "include": ["src/"],
-    "exclude": ["src/**/tests"],
+    "exclude": ["src/**/tests", "node_modules/"],
 }
