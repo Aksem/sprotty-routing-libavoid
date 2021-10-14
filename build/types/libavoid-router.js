@@ -153,14 +153,6 @@ var LibavoidRouter = /** @class */ (function (_super) {
         console.log("get", edge, args, this.avoidRoutes);
         return this.routeAll([edge], edge).get(edge.id) || [];
     };
-    // pointAt(edge: SRoutableElement, t: number): Point | undefined {
-    //   console.log("pointAt", edge, t);
-    //   const segments = this.calculateSegment(edge, t);
-    //   console.log("segments", segments);
-    //   if (!segments) return undefined;
-    //   const { segmentStart, segmentEnd, lambda } = segments;
-    //   return linear(segmentStart, segmentEnd, lambda);
-    // }
     LibavoidRouter.prototype.calculateSegment = function (edge, t) {
         if (t < 0 || t > 1)
             return undefined;
