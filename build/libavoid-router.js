@@ -31,9 +31,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { AvoidLib } from "libavoid-js";
-import { SRoutingHandle, EdgeRouting, LinearEdgeRouter, centerOfLine, euclideanDistance, isBoundsAware, SParentElement, } from "sprotty";
+import { SRoutingHandle, EdgeRouting, LinearEdgeRouter, centerOfLine, euclideanDistance, isBoundsAware, SParentElement, AnchorComputerRegistry, } from "sprotty";
 export function containsEdgeRoutes(args) {
     return args !== undefined && "edgeRoutes" in args;
 }
@@ -242,6 +242,10 @@ var LibavoidRouter = /** @class */ (function (_super) {
     };
     var LibavoidRouter_1;
     LibavoidRouter.KIND = "libavoid";
+    __decorate([
+        inject(AnchorComputerRegistry),
+        __metadata("design:type", AnchorComputerRegistry)
+    ], LibavoidRouter.prototype, "anchorRegistry", void 0);
     LibavoidRouter = LibavoidRouter_1 = __decorate([
         injectable(),
         __metadata("design:paramtypes", [])
