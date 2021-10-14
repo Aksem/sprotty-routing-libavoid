@@ -2,7 +2,7 @@
     "extends": "./base.tsconfig.json",
     "compilerOptions": {
       "noImplicitAny": true,
-      "outDir": "build/types",
+      "outDir": "build",
       "module": "esnext",
       "target": "es5",
       "allowJs": true,
@@ -11,7 +11,8 @@
       "noEmit": false,
       "suppressImplicitAnyIndexErrors": true,
       "lib": ["es2018", "dom"],
-      "moduleResolution": "node"
+      "moduleResolution": "node",
+      "skipLibCheck": true,
     },
     "include": ["src/"],
     "exclude": ["src/**/tests", "node_modules/"],
