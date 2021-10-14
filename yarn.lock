@@ -3733,10 +3733,10 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libavoid-js@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/libavoid-js/-/libavoid-js-0.1.2.tgz#3db406a15313d3911808c19663bace5e443b70b4"
-  integrity sha512-XQHfpVpzXqOL3sV0QBItbRzxh0XrYXgl4GKCD/lpyXmNlGx6v5Dy8Wnc28gJlqg9boM8sJuetX7ycB7wfq8HaA==
+libavoid-js@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/libavoid-js/-/libavoid-js-0.1.3.tgz#7917825530e1fc0da7e0a2b636ace172d01e4b8a"
+  integrity sha512-CTJwBXWbCmFBIdrqceZUFroLtO7lOJx4WX1lc9lPVkCzYORPXiB9LNf3HbY5hBTCIJQG4YJ2FjVjqsrh12QeGA==
 
 lilconfig@^2.0.3:
   version "2.0.3"
