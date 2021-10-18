@@ -1,6 +1,6 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "build/index.js",
   "types": "build/index.d.ts",
