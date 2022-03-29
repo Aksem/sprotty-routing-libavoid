@@ -1,5 +1,5 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
-import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, Point, EdgeRouting, LinearEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement, AnchorComputerRegistry } from "sprotty";
+import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, Point, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement, AnchorComputerRegistry } from "sprotty";
 export declare type AvoidRouteEdge = {
     child: SRoutableElement;
     connRef: AvoidInterface["ConnRef"];
@@ -16,7 +16,7 @@ export interface LibavoidRouteOptions extends LinearRouteOptions {
     /** The angle in radians below which a routing handle is removed. */
     removeAngleThreshold: number;
 }
-export declare class LibavoidRouter extends LinearEdgeRouter implements IMultipleEdgesRouter {
+export declare class LibavoidRouter extends AbstractEdgeRouter implements IMultipleEdgesRouter {
     anchorRegistry: AnchorComputerRegistry;
     avoidRouter: AvoidInterface["Router"];
     avoidRoutes: AvoidRoutes;

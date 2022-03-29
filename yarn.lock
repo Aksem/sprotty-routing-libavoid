@@ -1433,6 +1433,11 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
+"@vscode/codicons@^0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@vscode/codicons/-/codicons-0.0.25.tgz#4ebc3e2c9e707ac46aea0becceda79f7738c647c"
+  integrity sha512-uqPhTdADjwoCh5Ufbv0M6TZiiP2mqbfJVB4grhVx1k+YeP03LDMOHBWPsNwGKn4/0S5Mq9o1w1GeftvR031Gzg==
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
@@ -1579,10 +1584,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-autocompleter@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/autocompleter/-/autocompleter-5.1.0.tgz#da80488ddf1f1d89b0a8f5d36cab24439de18ab8"
-  integrity sha512-xFZla6guwywqFJutoi5xrhAmaKw4/TU8CcLuNep/3OtiUfpNXtgzuBkkXJ6ysJIfG6MEEXFtUBg3PREN6HUVyw==
+autocompleter@^5.1.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/autocompleter/-/autocompleter-5.2.0.tgz#9ed3df262614fd557bf4d5bf67ab13cdee008203"
+  integrity sha512-CMYgI+r7RGZFaT0SvXcyBn1hb/Ne6XbjXimWQPc16LcwZgUGFBHg/Pv8honrwkTZE4DbfrD/MzqlG+Bn2u+1ng==
 
 babel-eslint@^10.1.0:
   version "10.1.0"
@@ -2756,10 +2761,10 @@ file-loader@^6.2.0:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
-file-saver@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.2.tgz#06d6e728a9ea2df2cce2f8d9e84dfcdc338ec17a"
-  integrity sha512-Wz3c3XQ5xroCxd1G8b7yL0Ehkf0TC9oYC6buPFkNnU9EnaPlifeAFCyCh+iewXTyFRcg0a6j3J7FmJsIhlhBdw==
+file-saver@^2.0.2:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
 
 fill-range@^7.0.1:
   version "7.0.1"
@@ -3749,10 +3754,10 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libavoid-js@^0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/libavoid-js/-/libavoid-js-0.1.5.tgz#2b46fddc48e54bcedeab2ef4d4f06be106dba8f6"
-  integrity sha512-k3wDqC+KjKAzH/cieheQjqAben9QBSaJMK600gDJbQZkGbDJOtjqGFCURPxxOgMwjCzpxN8gWtT2WexsLJ3r3Q==
+libavoid-js@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/libavoid-js/-/libavoid-js-0.1.8.tgz#e8e2487f5c1f1bf5c30c4c8c41f110dc41c355fc"
+  integrity sha512-myTZl2AQBwKwTMkPL4XAsevSetuTeYD3ALrsY3rx4pm0DmD7jDmYIc43ut1Ck2/Dpf8ViIEJusdk23VnhLripA==
   dependencies:
     "@babel/runtime-corejs3" "^7.15.4"
     core-js-pure "^3.18.3"
@@ -4846,15 +4851,22 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
-sprotty@0.10.0-next.4039435:
-  version "0.10.0-next.4039435"
-  resolved "https://registry.yarnpkg.com/sprotty/-/sprotty-0.10.0-next.4039435.tgz#18b3b9d4073185bdc7467dd4330cfb089b033501"
-  integrity sha512-/8ranKdWSvI85EfKFDBCuhN0BbRdQG/ePaJTPfURlV7Czf5zx6xms1/k/btFQwVhtg8EHz+B0o/4/YR4QGPnoQ==
+sprotty-protocol@~0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/sprotty-protocol/-/sprotty-protocol-0.11.0.tgz#f8ff89121155520b4e32ea0c05927e7a56173b99"
+  integrity sha512-OxRKrKx8mNOxX8CBKsP4epu7YGjT4XvaGwNfAwtVQVh2OPQq98t78A86XGjJThw9axm950QX0KQWGbrzX7FJuQ==
+
+sprotty@0.11.1:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/sprotty/-/sprotty-0.11.1.tgz#3a04703cf10efe8bd89f02ecd6bb33637d9312c5"
+  integrity sha512-wHeDbhZeGPgZebJqoWpqrkQQlpfJ1uiXIjLgIIJOhY8+bkTkGClQDMget7H6Zun7yU56x/XtwgesDyMXA4BVFg==
   dependencies:
-    autocompleter "5.1.0"
-    file-saver "2.0.2"
+    "@vscode/codicons" "^0.0.25"
+    autocompleter "^5.1.0"
+    file-saver "^2.0.2"
     inversify "^5.0.1"
     snabbdom "^3.0.3"
+    sprotty-protocol "~0.11.0"
     tinyqueue "^2.0.3"
 
 stable@^0.1.8:

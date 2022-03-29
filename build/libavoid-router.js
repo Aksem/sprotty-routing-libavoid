@@ -33,7 +33,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { inject, injectable } from "inversify";
 import { AvoidLib } from "libavoid-js";
-import { SRoutingHandle, EdgeRouting, LinearEdgeRouter, centerOfLine, euclideanDistance, isBoundsAware, SParentElement, AnchorComputerRegistry, } from "sprotty";
+import { SRoutingHandle, EdgeRouting, AbstractEdgeRouter, centerOfLine, euclideanDistance, isBoundsAware, SParentElement, AnchorComputerRegistry, } from "sprotty";
 export function containsEdgeRoutes(args) {
     return args !== undefined && "edgeRoutes" in args;
 }
@@ -251,6 +251,6 @@ var LibavoidRouter = /** @class */ (function (_super) {
         __metadata("design:paramtypes", [])
     ], LibavoidRouter);
     return LibavoidRouter;
-}(LinearEdgeRouter));
+}(AbstractEdgeRouter));
 export { LibavoidRouter };
 //# sourceMappingURL=libavoid-router.js.map

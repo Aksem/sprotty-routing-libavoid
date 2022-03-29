@@ -7,7 +7,7 @@ import {
   ResolvedHandleMove,
   Point,
   EdgeRouting,
-  LinearEdgeRouter,
+  AbstractEdgeRouter,
   LinearRouteOptions,
   centerOfLine,
   euclideanDistance,
@@ -43,7 +43,7 @@ export interface LibavoidRouteOptions extends LinearRouteOptions {
 
 @injectable()
 export class LibavoidRouter
-  extends LinearEdgeRouter
+  extends AbstractEdgeRouter
   implements IMultipleEdgesRouter
 {
   @inject(AnchorComputerRegistry) anchorRegistry: AnchorComputerRegistry;
