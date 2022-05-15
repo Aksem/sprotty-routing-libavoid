@@ -22,40 +22,110 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-import { inject, injectable } from "inversify";
 import { AvoidLib } from "libavoid-js";
-import { SRoutingHandle, EdgeRouting, AbstractEdgeRouter, centerOfLine, euclideanDistance, isBoundsAware, SParentElement, AnchorComputerRegistry, } from "sprotty";
+import { SRoutableElement, SRoutingHandle, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SParentElement, SLabel, SCompartment, SPort, } from "sprotty";
+import { centerOfLine } from "sprotty-protocol";
 export function containsEdgeRoutes(args) {
     return args !== undefined && "edgeRoutes" in args;
 }
+export var RouteType;
+(function (RouteType) {
+    RouteType[RouteType["PolyLine"] = 1] = "PolyLine";
+    RouteType[RouteType["Orthogonal"] = 2] = "Orthogonal";
+})(RouteType || (RouteType = {}));
+// equal to ConnDirFlag in libavoid
+export var Directions;
+(function (Directions) {
+    Directions[Directions["None"] = 0] = "None";
+    Directions[Directions["Up"] = 1] = "Up";
+    Directions[Directions["Down"] = 2] = "Down";
+    Directions[Directions["Left"] = 4] = "Left";
+    Directions[Directions["Right"] = 8] = "Right";
+    Directions[Directions["All"] = 15] = "All";
+})(Directions || (Directions = {}));
+// there are two types of configuration parameters in libavoid Router: parameter and option.
+// For sprotty router they are unified as 'options', but their type in libavoid should be known
+// to set them in router
+var routerOptionType = {
+    // routingType is a custom option, not inherited from libavoid
+    routingType: undefined,
+    segmentPenalty: "parameter",
+    anglePenalty: "parameter",
+    crossingPenalty: "parameter",
+    clusterCrossingPenalty: "parameter",
+    fixedSharedPathPenalty: "parameter",
+    portDirectionPenalty: "parameter",
+    shapeBufferDistance: "parameter",
+    idealNudgingDistance: "parameter",
+    reverseDirectionPenalty: "parameter",
+    nudgeOrthogonalSegmentsConnectedToShapes: "option",
+    improveHyperedgeRoutesMovingJunctions: "option",
+    penaliseOrthogonalSharedPathsAtConnEnds: "option",
+    nudgeOrthogonalTouchingColinearSegments: "option",
+    performUnifyingNudgingPreprocessingStep: "option",
+    improveHyperedgeRoutesMovingAddingAndDeletingJunctions: "option",
+    nudgeSharedPathsWithCommonEndPoint: "option",
+};
+var sizeIsEqual = function (bounds1, bounds2) {
+    return bounds1.width === bounds2.width && bounds1.height === bounds2.height;
+};
+var positionIsEqual = function (bounds1, bounds2) {
+    return bounds1.x === bounds2.x && bounds1.y === bounds2.y;
+};
+var LibavoidEdge = /** @class */ (function (_super) {
+    __extends(LibavoidEdge, _super);
+    function LibavoidEdge() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.routeType = 0;
+        _this.sourceVisibleDirections = undefined;
+        _this.targetVisibleDirections = undefined;
+        _this.hateCrossings = false;
+        return _this;
+    }
+    return LibavoidEdge;
+}(SRoutableElement));
+export { LibavoidEdge };
 var LibavoidRouter = /** @class */ (function (_super) {
     __extends(LibavoidRouter, _super);
     function LibavoidRouter() {
         var _this = _super.call(this) || this;
         _this.renderedTimes = 0;
+        _this.avoidConnRefsByEdgeId = {};
+        _this.avoidShapes = {};
+        _this.options = {};
+        _this.edgeRouting = new EdgeRouting();
+        _this.firstRender = true;
         var Avoid = AvoidLib.getInstance();
-        _this.avoidRouter = new Avoid.Router(Avoid.OrthogonalRouting | Avoid.PolyLineRouting);
-        _this.avoidRoutes = {};
-        console.log("router", _this.avoidRouter);
+        _this.avoidRouter = new Avoid.Router(Avoid.PolyLineRouting);
         return _this;
     }
-    LibavoidRouter_1 = LibavoidRouter;
     Object.defineProperty(LibavoidRouter.prototype, "kind", {
         get: function () {
-            return LibavoidRouter_1.KIND;
+            return LibavoidRouter.KIND;
         },
         enumerable: false,
         configurable: true
     });
+    LibavoidRouter.prototype.setOptions = function (options) {
+        var _this = this;
+        var Avoid = AvoidLib.getInstance();
+        if ("routingType" in options && options.routingType) {
+            // routingType can not be changed for router instance
+            // reinstantiate router
+            Avoid.destroy(this.avoidRouter);
+            this.avoidRouter = new Avoid.Router(options.routingType);
+        }
+        this.options = __assign(__assign({}, this.options), options);
+        Object.entries(this.options).forEach(function (_a) {
+            var key = _a[0], value = _a[1];
+            if (routerOptionType[key] === "parameter") {
+                _this.avoidRouter.setRoutingParameter(Avoid[key], value);
+            }
+            else if (routerOptionType[key] === "option") {
+                _this.avoidRouter.setRoutingOption(Avoid[key], value);
+            }
+        });
+    };
     LibavoidRouter.prototype.getAllBoundsAwareChildren = function (parent) {
         var result = [];
         for (var _i = 0, _a = parent.children; _i < _a.length; _i++) {
@@ -86,108 +156,175 @@ var LibavoidRouter = /** @class */ (function (_super) {
         }
         return { x: x, y: y };
     };
-    LibavoidRouter.prototype.avoidRoutesToEdgeRoutes = function (avoidRoutes) {
-        var routes = new EdgeRouting();
-        for (var _i = 0, avoidRoutes_1 = avoidRoutes; _i < avoidRoutes_1.length; _i++) {
-            var connection = avoidRoutes_1[_i];
-            var sprottyRoute = [];
-            var route = connection.connRef.displayRoute();
-            for (var i = 0; i < route.size(); i++) {
-                var kind = "linear";
-                if (i === 0) {
-                    kind = "source";
-                }
-                else if (i === route.size() - 1) {
-                    kind = "target";
-                }
-                sprottyRoute.push({
-                    x: route.get_ps(i).x,
-                    y: route.get_ps(i).y,
-                    kind: kind,
-                    pointIndex: 1,
-                });
-            }
-            routes.set(connection.child.id, sprottyRoute);
-            this.avoidRoutes[connection.child.id] = __assign(__assign({}, this.avoidRoutes[connection.child.id]), { routes: sprottyRoute });
+    LibavoidRouter.prototype.updateConnRefInEdgeRouting = function (connRef, edge) {
+        if (!edge.source || !edge.target) {
+            return;
         }
-        return routes;
+        var sprottyRoute = [];
+        var route = connRef.displayRoute();
+        var sourcePoint;
+        var targetPoint;
+        if (route.size() > 2) {
+            targetPoint = {
+                x: route.get_ps(1).x,
+                y: route.get_ps(1).y,
+            };
+            sourcePoint = {
+                x: route.get_ps(route.size() - 2).x,
+                y: route.get_ps(route.size() - 2).y,
+            };
+        }
+        else {
+            // Use the target point as start anchor reference
+            // TODO: calculate center
+            targetPoint = {
+                x: route.get_ps(route.size() - 1).x,
+                y: route.get_ps(route.size() - 1).y,
+            };
+            // Use the source center as end anchor reference
+            // TODO: calculate center
+            sourcePoint = {
+                x: route.get_ps(0).x,
+                y: route.get_ps(0).y,
+            };
+        }
+        var sourceAnchor = this.getTranslatedAnchor(edge.source, targetPoint, edge.parent, edge, edge.sourceAnchorCorrection);
+        sprottyRoute.push(__assign({ kind: "source" }, sourceAnchor));
+        for (var i = 0; i < route.size(); i++) {
+            // source and target points are set below separately as anchors
+            if (i === 0 || i === route.size() - 1) {
+                continue;
+            }
+            var point = {
+                x: route.get_ps(i).x,
+                y: route.get_ps(i).y,
+                kind: "linear",
+                pointIndex: i,
+            };
+            sprottyRoute.push(point);
+        }
+        var targetAnchor = this.getTranslatedAnchor(edge.target, sourcePoint, edge.parent, edge, edge.targetAnchorCorrection);
+        sprottyRoute.push(__assign({ kind: "target" }, targetAnchor));
+        this.edgeRouting.set(edge.id, sprottyRoute);
     };
     LibavoidRouter.prototype.routeAll = function (edges, parent) {
-        // TODO: avoid recalculating of the same elements
-        var connections = [];
+        var _this = this;
+        console.log('route');
         var Avoid = AvoidLib.getInstance();
-        this.avoidRouter = new Avoid.Router(Avoid.OrthogonalRouting | Avoid.PolyLineRouting);
-        for (var _i = 0, edges_1 = edges; _i < edges_1.length; _i++) {
-            var child = edges_1[_i];
-            var sourceConnectionEnd = this.getCenterPoint(child.source);
-            var targetConnectionEnd = this.getCenterPoint(child.target);
-            var connRef = new Avoid.ConnRef(this.avoidRouter, new Avoid.ConnEnd(new Avoid.Point(sourceConnectionEnd.x, sourceConnectionEnd.y)), new Avoid.ConnEnd(new Avoid.Point(targetConnectionEnd.x, targetConnectionEnd.y)));
-            var routingType = Avoid.PolyLineRouting;
-            if (child.routerKind === "manhattan") {
-                routingType = Avoid.OrthogonalRouting;
-            }
-            connRef.setRoutingType(routingType);
-            connections.push({ child: child, connRef: connRef, routes: [] });
-            this.avoidRoutes[child.id] = { connRef: connRef, child: child, routes: [] };
+        var routesChanged = false;
+        if (this.firstRender) {
+            this.firstRender = false;
+            return this.edgeRouting;
         }
+        // add shapes to libavoid router
         var connectables = this.getAllBoundsAwareChildren(parent);
-        console.log("connectables count: ", connectables.length);
-        for (var _a = 0, _b = connectables; _a < _b.length; _a++) {
-            var child = _b[_a];
-            var centerPoint = this.getCenterPoint(child);
-            var rectangle = new Avoid.Rectangle(new Avoid.Point(centerPoint.x, centerPoint.y), child.bounds.width, child.bounds.height);
-            new Avoid.ShapeRef(this.avoidRouter, rectangle);
-        }
-        this.avoidRouter.processTransaction();
-        var edgeRoutes = this.avoidRoutesToEdgeRoutes(connections);
-        for (var _c = 0, connections_1 = connections; _c < connections_1.length; _c++) {
-            var connection = connections_1[_c];
-            this.avoidRouter.deleteConnector(connection.connRef);
-        }
-        Avoid.destroy(this.avoidRouter);
-        this.renderedTimes += 1;
-        console.log(connections);
-        return edgeRoutes;
-    };
-    LibavoidRouter.prototype.route = function (edge, args) {
-        console.log("get", edge, args, this.avoidRoutes);
-        return this.routeAll([edge], edge).get(edge.id) || [];
-    };
-    LibavoidRouter.prototype.calculateSegment = function (edge, t) {
-        if (t < 0 || t > 1)
-            return undefined;
-        var routedPoints = this.avoidRoutes[edge.id].routes;
-        console.log("points", routedPoints.length);
-        if (routedPoints.length < 2)
-            return undefined;
-        var segmentLengths = [];
-        var totalLength = 0;
-        for (var i = 0; i < routedPoints.length - 1; ++i) {
-            segmentLengths[i] = euclideanDistance(routedPoints[i], routedPoints[i + 1]);
-            totalLength += segmentLengths[i];
-        }
-        var currentLenght = 0;
-        var tAsLenght = t * totalLength;
-        for (var i = 0; i < routedPoints.length - 1; ++i) {
-            var newLength = currentLenght + segmentLengths[i];
-            // avoid division by (almost) zero
-            if (segmentLengths[i] > 1e-8) {
-                if (newLength >= tAsLenght) {
-                    var lambda = Math.max(0, tAsLenght - currentLenght) / segmentLengths[i];
-                    return {
-                        segmentStart: routedPoints[i],
-                        segmentEnd: routedPoints[i + 1],
-                        lambda: lambda,
-                    };
+        console.log(connectables);
+        for (var _i = 0, _a = connectables; _i < _a.length; _i++) {
+            var child = _a[_i];
+            if (child instanceof SRoutableElement || child instanceof SLabel || child instanceof SCompartment || child instanceof SPort) {
+                // skip edges and labels
+                continue;
+            }
+            if (child.bounds.width === -1) {
+                // pre-rendering phase, skip
+                return this.edgeRouting;
+            }
+            console.log('shape: ', child);
+            if (child.id in this.avoidShapes) {
+                // shape is modified or unchanged
+                // if modified: size or/and position
+                if (!positionIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
+                    this.avoidRouter.moveShape(this.avoidShapes[child.id].ref, child.bounds.x - this.avoidShapes[child.id].bounds.x, child.bounds.y - this.avoidShapes[child.id].bounds.y);
+                    this.avoidShapes[child.id].bounds = __assign({}, child.bounds);
+                    if (!routesChanged) {
+                        routesChanged = true;
+                    }
+                }
+                if (!sizeIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
+                    // TODO: change shape size
+                    if (!routesChanged) {
+                        routesChanged = true;
+                    }
                 }
             }
-            currentLenght = newLength;
+            else {
+                console.log(child);
+                // new shape
+                var centerPoint = this.getCenterPoint(child);
+                var rectangle = new Avoid.Rectangle(new Avoid.Point(centerPoint.x, centerPoint.y), child.bounds.width, child.bounds.height);
+                var shapeRef = new Avoid.ShapeRef(this.avoidRouter, rectangle);
+                var shapeCenterPin = new Avoid.ShapeConnectionPin(shapeRef, 1, 0.5, 0.5, true, 0, Directions.All);
+                shapeCenterPin.setExclusive(false);
+                this.avoidShapes[child.id] = {
+                    ref: shapeRef,
+                    bounds: __assign({}, child.bounds),
+                };
+                if (!routesChanged) {
+                    routesChanged = true;
+                }
+            }
         }
-        return {
-            segmentEnd: routedPoints.pop(),
-            segmentStart: routedPoints.pop(),
-            lambda: 1,
+        var connectableIds = connectables.map(function (c) { return c.id; });
+        for (var _b = 0, _c = Object.keys(this.avoidShapes); _b < _c.length; _b++) {
+            var shapeId = _c[_b];
+            if (!connectableIds.includes(shapeId)) {
+                // deleted shape
+                this.avoidRouter.deleteShape(this.avoidShapes[shapeId].ref);
+                delete this.avoidShapes[shapeId];
+                if (!routesChanged) {
+                    routesChanged = true;
+                }
+            }
+        }
+        var _loop_1 = function (edge) {
+            // check also source and target?
+            if (edge.id in this_1.avoidConnRefsByEdgeId) {
+                return "continue";
+            }
+            // TODO: pins visible directions
+            var sourceConnEnd = new Avoid.ConnEnd(this_1.avoidShapes[edge.sourceId].ref, 1);
+            var targetConnEnd = new Avoid.ConnEnd(this_1.avoidShapes[edge.targetId].ref, 1);
+            var connRef = new Avoid.ConnRef(this_1.avoidRouter, sourceConnEnd, targetConnEnd);
+            connRef.setCallback(function (changedConnRef) {
+                // NOTE: changedConnRef is a raw pointer, not class instance
+                _this.updateConnRefInEdgeRouting(Avoid.wrapPointer(changedConnRef, Avoid.ConnRef), edge);
+            }, connRef);
+            // connection options
+            if (edge.routeType) {
+                connRef.setRoutingType(edge.routeType);
+            }
+            if (edge.hateCrossings) {
+                connRef.setHateCrossings(edge.hateCrossings);
+            }
+            this_1.avoidConnRefsByEdgeId[edge.id] = connRef;
         };
+        var this_1 = this;
+        for (var _d = 0, edges_1 = edges; _d < edges_1.length; _d++) {
+            var edge = edges_1[_d];
+            _loop_1(edge);
+        }
+        // check for deleted edges
+        var edgesIds = edges.map(function (e) { return e.id; });
+        for (var _e = 0, _f = Object.keys(this.avoidConnRefsByEdgeId); _e < _f.length; _e++) {
+            var oldEdgeId = _f[_e];
+            if (!edgesIds.includes(oldEdgeId)) {
+                this.avoidRouter.deleteConnector(this.avoidConnRefsByEdgeId[oldEdgeId]);
+                delete this.avoidConnRefsByEdgeId[oldEdgeId];
+            }
+        }
+        if (routesChanged) {
+            this.avoidRouter.processTransaction();
+        }
+        return this.edgeRouting;
+    };
+    LibavoidRouter.prototype.destroy = function () {
+        // TODO: explain need of calling destroy
+        var Avoid = AvoidLib.getInstance();
+        Avoid.destroy(this.avoidRouter);
+    };
+    LibavoidRouter.prototype.route = function (edge, args) {
+        // return this.routeAll([edge], edge).get(edge.id) || [];
+        return [];
     };
     LibavoidRouter.prototype.createRoutingHandles = function (edge) {
         var rpCount = edge.routingPoints.length;
@@ -235,21 +372,11 @@ var LibavoidRouter = /** @class */ (function (_super) {
     LibavoidRouter.prototype.getOptions = function (edge) {
         return {
             minimalPointDistance: 2,
-            removeAngleThreshold: 0.1,
             standardDistance: 20,
             selfEdgeOffset: 0.25,
         };
     };
-    var LibavoidRouter_1;
     LibavoidRouter.KIND = "libavoid";
-    __decorate([
-        inject(AnchorComputerRegistry),
-        __metadata("design:type", AnchorComputerRegistry)
-    ], LibavoidRouter.prototype, "anchorRegistry", void 0);
-    LibavoidRouter = LibavoidRouter_1 = __decorate([
-        injectable(),
-        __metadata("design:paramtypes", [])
-    ], LibavoidRouter);
     return LibavoidRouter;
 }(AbstractEdgeRouter));
 export { LibavoidRouter };

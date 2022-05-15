@@ -35,7 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { AvoidLib } from "libavoid-js";
-import { LibavoidRouter } from "./libavoid-router";
+import { LibavoidRouter, LibavoidEdge, RouteType, Directions, } from "./libavoid-router";
+import { LibavoidEllipseAnchor, LibavoidDiamondAnchor, LibavoidRectangleAnchor } from "./libavoid-router-anchors";
 export function load() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -48,5 +49,5 @@ export function load() {
         });
     });
 }
-export { LibavoidRouter };
+export { LibavoidRouter, LibavoidEdge, RouteType, Directions, LibavoidEllipseAnchor, LibavoidDiamondAnchor, LibavoidRectangleAnchor };
 //# sourceMappingURL=index.js.map

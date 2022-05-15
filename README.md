@@ -5,6 +5,8 @@
  
 </div>
 
+**Supported Sprotty versions:** 0.11
+
 ## 📦 Getting Started
 
 ```

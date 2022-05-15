@@ -3754,10 +3754,10 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libavoid-js@^0.1.8:
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/libavoid-js/-/libavoid-js-0.1.8.tgz#e8e2487f5c1f1bf5c30c4c8c41f110dc41c355fc"
-  integrity sha512-myTZl2AQBwKwTMkPL4XAsevSetuTeYD3ALrsY3rx4pm0DmD7jDmYIc43ut1Ck2/Dpf8ViIEJusdk23VnhLripA==
+libavoid-js@^0.1.14:
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/libavoid-js/-/libavoid-js-0.1.14.tgz#d19aaa90fa5c81f019f67acdf4d08b2081ccd153"
+  integrity sha512-5l0JgDqyuUMVipIPiHKLh3Dj5OU1BrQfhts4wGSVYcdlYbSHMCSQ+zV9kCaCmlRIxtrTE6nZw34cke2QCbiDFQ==
   dependencies:
     "@babel/runtime-corejs3" "^7.15.4"
     core-js-pure "^3.18.3"
