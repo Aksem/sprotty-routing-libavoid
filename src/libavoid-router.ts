@@ -1,4 +1,4 @@
-import { Avoid as AvoidInterface, AvoidLib, Point } from "libavoid-js";
+import { Avoid as AvoidInterface, AvoidLib } from "libavoid-js";
 import {
   SRoutableElement,
   SRoutingHandle,
@@ -15,8 +15,10 @@ import {
   SLabel,
   SCompartment,
   SPort,
+  SEdge,
+  SButton,
 } from "sprotty";
-import { Bounds, centerOfLine } from "sprotty-protocol";
+import { Point, Bounds, centerOfLine } from "sprotty-protocol";
 
 export type AvoidConnRefsByEdgeId = {
   [key: string]: AvoidInterface["ConnRef"];
@@ -313,10 +315,8 @@ export interface LibavoidRouteOptions {
   hateCrossings?: boolean;
 }
 
-export class LibavoidEdge
-  extends SRoutableElement
-  implements LibavoidRouteOptions
-{
+export class LibavoidEdge extends SEdge implements LibavoidRouteOptions {
+  public readonly routerKind = LibavoidRouter.KIND;
   routeType = 0;
   sourceVisibleDirections = undefined;
   targetVisibleDirections = undefined;
@@ -334,6 +334,7 @@ export class LibavoidRouter
   renderedTimes = 0;
   firstRender: boolean;
   edgeRouting: EdgeRouting;
+  changedEdgeIds: string[];
   static readonly KIND = "libavoid";
 
   constructor() {
@@ -343,6 +344,7 @@ export class LibavoidRouter
     this.options = {};
     this.edgeRouting = new EdgeRouting();
     this.firstRender = true;
+    this.changedEdgeIds = [];
 
     const Avoid: AvoidInterface =
       AvoidLib.getInstance() as unknown as AvoidInterface;
@@ -412,6 +414,48 @@ export class LibavoidRouter
     return { x, y };
   }
 
+  getFixedTranslatedAnchor(
+    connectable: SConnectableElement,
+    sourcePoint: Point,
+    refPoint: Point,
+    refContainer: SParentElement,
+    edge: SRoutableElement,
+    anchorCorrection: number = 0
+  ) {
+    let anchor = this.getTranslatedAnchor(
+      connectable,
+      refPoint,
+      refContainer,
+      edge,
+      anchorCorrection
+    );
+    // AnchorComputer calculates anchor for edge independent from
+    // other edges. If router nudges the edge, it cannot take it into account
+    // because only target point is passed, no source point.
+    //
+    // To fix this, changes in sprotty API are needed.
+    // Temporary fix until sprotty API is changed: check whether edge is nudged
+    // and fix appropriate coordinate of anchor manually.
+    //
+    // NOTE: This fix works only for anchor computer that calculates anchor from source
+    // node center for orthogonal edge.
+    if (sourcePoint.x === refPoint.x) {
+      // first edge line is vertical, use x coordinate from router
+      anchor = {
+        x: sourcePoint.x,
+        y: anchor.y,
+      };
+    } else if (sourcePoint.y === refPoint.y) {
+      // first edge line is horizontal, use y coordinate from router
+      anchor = {
+        x: anchor.x,
+        y: sourcePoint.y,
+      };
+    }
+
+    return anchor;
+  }
+
   updateConnRefInEdgeRouting(
     connRef: AvoidInterface["ConnRef"],
     edge: LibavoidEdge
@@ -422,37 +466,24 @@ export class LibavoidRouter
 
     const sprottyRoute: RoutedPoint[] = [];
     const route = connRef.displayRoute();
-    
-    let sourcePoint: Point;
-    let targetPoint: Point;
-    if (route.size() > 2) {
-      targetPoint = {
-        x: route.get_ps(1).x,
-        y: route.get_ps(1).y,
-      };
-      sourcePoint = {
-        x: route.get_ps(route.size() - 2).x,
-        y: route.get_ps(route.size() - 2).y,
-      };
-    } else {
-      // Use the target point as start anchor reference
-      // TODO: calculate center
-      targetPoint = {
-        x: route.get_ps(route.size() - 1).x,
-        y: route.get_ps(route.size() - 1).y,
-      };
 
-      // Use the source center as end anchor reference
-      // TODO: calculate center
-      sourcePoint = {
-        x: route.get_ps(0).x,
-        y: route.get_ps(0).y,
-      };
+    const avoidRoute = [];
+    for (let i=0; i<route.size(); i++) {
+      avoidRoute.push({ x: route.get_ps(i).x, y: route.get_ps(i).y });
     }
 
-    const sourceAnchor = this.getTranslatedAnchor(
+    const sourcePointForSourceAnchor = {
+      x: route.get_ps(0).x,
+      y: route.get_ps(0).y,
+    };
+    const targetPointForSourceAnchor = {
+      x: route.get_ps(1).x,
+      y: route.get_ps(1).y,
+    };
+    const sourceAnchor = this.getFixedTranslatedAnchor(
       edge.source,
-      targetPoint,
+      sourcePointForSourceAnchor,
+      targetPointForSourceAnchor,
       edge.parent,
       edge,
       edge.sourceAnchorCorrection
@@ -473,15 +504,23 @@ export class LibavoidRouter
       sprottyRoute.push(point);
     }
 
-    const targetAnchor = this.getTranslatedAnchor(
+    const sourcePointForTargetAnchor = {
+      x: route.get_ps(route.size() - 1).x,
+      y: route.get_ps(route.size() - 1).y,
+    };
+    const targetPointForTargetAnchor = {
+      x: route.get_ps(route.size() - 2).x,
+      y: route.get_ps(route.size() - 2).y,
+    };
+    const targetAnchor = this.getFixedTranslatedAnchor(
       edge.target,
-      sourcePoint,
+      sourcePointForTargetAnchor,
+      targetPointForTargetAnchor,
       edge.parent,
       edge,
       edge.targetAnchorCorrection
     );
     sprottyRoute.push({ kind: "target", ...targetAnchor });
-
     this.edgeRouting.set(edge.id, sprottyRoute);
   }
 
@@ -497,7 +536,13 @@ export class LibavoidRouter
     // add shapes to libavoid router
     const connectables = this.getAllBoundsAwareChildren(parent);
     for (const child of connectables as SConnectableElement[]) {
-      if (child instanceof SRoutableElement || child instanceof SLabel || child instanceof SCompartment || child instanceof SPort) {
+      if (
+        child instanceof SRoutableElement ||
+        child instanceof SLabel ||
+        child instanceof SCompartment ||
+        child instanceof SPort ||
+        child instanceof SButton
+      ) {
         // skip edges and labels
         continue;
       }
@@ -514,13 +559,34 @@ export class LibavoidRouter
             child.bounds.x - this.avoidShapes[child.id].bounds.x,
             child.bounds.y - this.avoidShapes[child.id].bounds.y
           );
-          this.avoidShapes[child.id].bounds = { ...child.bounds };
+          this.avoidShapes[child.id].bounds = {
+            ...this.avoidShapes[child.id].bounds,
+            x: child.bounds.x,
+            y: child.bounds.y,
+          };
           if (!routesChanged) {
             routesChanged = true;
           }
         }
         if (!sizeIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
-          // TODO: change shape size
+          // shape size changed
+          const centerPoint = this.getCenterPoint(child);
+          const newRectangle = new Avoid.Rectangle(
+            new Avoid.Point(centerPoint.x, centerPoint.y),
+            child.bounds.width,
+            child.bounds.height
+          );
+          // moveShape can not only move element, but also resize it(it's only one
+          // correct way to resize)
+          this.avoidRouter.moveShape(
+            this.avoidShapes[child.id].ref,
+            newRectangle,
+          );
+          this.avoidShapes[child.id].bounds = {
+            ...this.avoidShapes[child.id].bounds,
+            width: child.bounds.width,
+            height: child.bounds.height,
+          };
           if (!routesChanged) {
             routesChanged = true;
           }
@@ -568,7 +634,9 @@ export class LibavoidRouter
       }
     }
 
+    const edgeById = {};
     for (const edge of edges) {
+      edgeById[edge.id] = edge;
       // check also source and target?
       if (edge.id in this.avoidConnRefsByEdgeId) {
         continue;
@@ -588,12 +656,9 @@ export class LibavoidRouter
         sourceConnEnd as AvoidInterface["ConnEnd"],
         targetConnEnd as AvoidInterface["ConnEnd"]
       );
-      connRef.setCallback((changedConnRef) => {
-        // NOTE: changedConnRef is a raw pointer, not class instance
-        this.updateConnRefInEdgeRouting(
-          Avoid.wrapPointer(changedConnRef, Avoid.ConnRef),
-          edge
-        );
+      connRef.setCallback(() => {
+        // save only edge id, because edge object can be changed til callback call
+        this.changedEdgeIds.push(edge.id);
       }, connRef);
 
       // connection options
@@ -619,6 +684,17 @@ export class LibavoidRouter
     if (routesChanged) {
       this.avoidRouter.processTransaction();
     }
+
+    // handle edge changes separately, not directly in callback, because edge
+    // can be changed between callback creationg and edge change. Save only
+    // edge id and handle change here with actual edge
+    this.changedEdgeIds.forEach((edgeId) => {
+      this.updateConnRefInEdgeRouting(
+        this.avoidConnRefsByEdgeId[edgeId],
+        edgeById[edgeId]
+      );
+    })
+    this.changedEdgeIds = [];
     return this.edgeRouting;
   }
 
@@ -633,8 +709,7 @@ export class LibavoidRouter
     edge: Readonly<LibavoidEdge>,
     args?: Record<string, unknown>
   ): RoutedPoint[] {
-    // return this.routeAll([edge], edge).get(edge.id) || [];
-    return [];
+    return this.edgeRouting.get(edge.id) || [];
   }
 
   createRoutingHandles(edge: SRoutableElement): void {

@@ -1,6 +1,6 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
-import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement } from "sprotty";
-import { Bounds } from "sprotty-protocol";
+import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement, SEdge } from "sprotty";
+import { Point, Bounds } from "sprotty-protocol";
 export declare type AvoidConnRefsByEdgeId = {
     [key: string]: AvoidInterface["ConnRef"];
 };
@@ -51,7 +51,8 @@ export interface LibavoidRouteOptions {
     targetVisibleDirections?: Directions;
     hateCrossings?: boolean;
 }
-export declare class LibavoidEdge extends SRoutableElement implements LibavoidRouteOptions {
+export declare class LibavoidEdge extends SEdge implements LibavoidRouteOptions {
+    readonly routerKind = "libavoid";
     routeType: number;
     sourceVisibleDirections: undefined;
     targetVisibleDirections: undefined;
@@ -65,6 +66,7 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
     renderedTimes: number;
     firstRender: boolean;
     edgeRouting: EdgeRouting;
+    changedEdgeIds: string[];
     static readonly KIND = "libavoid";
     constructor();
     get kind(): string;
@@ -74,13 +76,14 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
         x: number;
         y: number;
     };
+    getFixedTranslatedAnchor(connectable: SConnectableElement, sourcePoint: Point, refPoint: Point, refContainer: SParentElement, edge: SRoutableElement, anchorCorrection?: number): Point;
     updateConnRefInEdgeRouting(connRef: AvoidInterface["ConnRef"], edge: LibavoidEdge): void;
     routeAll(edges: LibavoidEdge[], parent: SParentElement): EdgeRouting;
     destroy(): void;
     route(edge: Readonly<LibavoidEdge>, args?: Record<string, unknown>): RoutedPoint[];
     createRoutingHandles(edge: SRoutableElement): void;
     applyInnerHandleMoves(edge: SRoutableElement, moves: ResolvedHandleMove[]): void;
-    getInnerHandlePosition(edge: SRoutableElement, route: RoutedPoint[], handle: SRoutingHandle): import("sprotty-protocol").Point | undefined;
+    getInnerHandlePosition(edge: SRoutableElement, route: RoutedPoint[], handle: SRoutingHandle): Point | undefined;
     protected getOptions(edge: LibavoidEdge): LinearRouteOptions;
 }
 export {};
