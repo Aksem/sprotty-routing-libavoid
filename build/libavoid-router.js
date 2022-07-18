@@ -24,7 +24,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import { AvoidLib } from "libavoid-js";
 import { SRoutableElement, SRoutingHandle, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SParentElement, SLabel, SCompartment, SPort, SEdge, SButton, } from "sprotty";
-import { centerOfLine } from "sprotty-protocol";
+import { Point, centerOfLine } from "sprotty-protocol";
 export function containsEdgeRoutes(args) {
     return args !== undefined && "edgeRoutes" in args;
 }
@@ -414,6 +414,60 @@ var LibavoidRouter = /** @class */ (function (_super) {
             standardDistance: 20,
             selfEdgeOffset: 0.25,
         };
+    };
+    /**
+     * Calculation is similar as in original method, but `minimalSegmentLengthForChildPosition`
+     * parameter is introduced(see LibavoidRouterOptions.minimalSegmentLengthForChildPosition for
+     * more details) to avoid getting very small segments, that has negative impact for example on
+     * placing edge children such as labels.
+     */
+    LibavoidRouter.prototype.calculateSegment = function (edge, t) {
+        var segments = _super.prototype.calculateSegment.call(this, edge, t);
+        if (!segments)
+            return undefined;
+        var segmentStart = segments.segmentStart, segmentEnd = segments.segmentEnd, lambda = segments.lambda;
+        var segmentLength = Point.euclideanDistance(segmentStart, segmentEnd);
+        // avoid placing labels on very small segments
+        var minSegmentSize = this.options.minimalSegmentLengthForChildPosition === undefined
+            ? 20
+            : this.options.minimalSegmentLengthForChildPosition;
+        if (segmentLength < minSegmentSize) {
+            var routedPoints = this.route(edge);
+            if (routedPoints.length < 2)
+                return undefined;
+            // try to find longer segment before segmentStart
+            var found = false;
+            var segmentStartIndex = routedPoints.findIndex(function (point) {
+                return Point.equals(point, segmentStart);
+            });
+            for (var i = segmentStartIndex - 1; i >= 0; i--) {
+                var currentSegmentLength = Point.euclideanDistance(routedPoints[i], routedPoints[i + 1]);
+                if (currentSegmentLength > minSegmentSize) {
+                    segmentStart = routedPoints[i];
+                    segmentEnd = routedPoints[i + 1];
+                    lambda = 0.8;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                var segmentEndIndex = segmentStartIndex + 1;
+                if (segmentEndIndex < routedPoints.length - 1) {
+                    // no long enough segment before segmentStart, try to find one after segmentEnd
+                    for (var i = segmentEndIndex; i < routedPoints.length - 1; i++) {
+                        var currentSegmentLength = Point.euclideanDistance(routedPoints[i], routedPoints[i + 1]);
+                        if (currentSegmentLength > minSegmentSize) {
+                            segmentStart = routedPoints[i];
+                            segmentEnd = routedPoints[i + 1];
+                            lambda = 0.2;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return { segmentStart: segmentStart, segmentEnd: segmentEnd, lambda: lambda };
     };
     LibavoidRouter.KIND = "libavoid";
     return LibavoidRouter;

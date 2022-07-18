@@ -5,7 +5,7 @@ import {
   RECTANGULAR_ANCHOR_KIND,
   EllipseAnchor,
   RectangleAnchor,
-  DiamondAnchor,
+  ManhattanDiamondAnchor,
 } from "sprotty";
 
 import { LibavoidRouter } from "./libavoid-router";
@@ -28,8 +28,10 @@ export class LibavoidRectangleAnchor
   }
 }
 
+// Use ManhattanDiamondAnchor instead DiamondAnchor, because it calculates
+// lines to diamond sides, not rectangle around diamond
 export class LibavoidDiamondAnchor
-  extends DiamondAnchor
+  extends ManhattanDiamondAnchor
   implements IAnchorComputer
 {
   get kind() {

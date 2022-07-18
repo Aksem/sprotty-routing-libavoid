@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-import { DIAMOND_ANCHOR_KIND, ELLIPTIC_ANCHOR_KIND, RECTANGULAR_ANCHOR_KIND, EllipseAnchor, RectangleAnchor, DiamondAnchor, } from "sprotty";
+import { DIAMOND_ANCHOR_KIND, ELLIPTIC_ANCHOR_KIND, RECTANGULAR_ANCHOR_KIND, EllipseAnchor, RectangleAnchor, ManhattanDiamondAnchor, } from "sprotty";
 import { LibavoidRouter } from "./libavoid-router";
 var LibavoidEllipseAnchor = /** @class */ (function (_super) {
     __extends(LibavoidEllipseAnchor, _super);
@@ -43,6 +43,8 @@ var LibavoidRectangleAnchor = /** @class */ (function (_super) {
     return LibavoidRectangleAnchor;
 }(RectangleAnchor));
 export { LibavoidRectangleAnchor };
+// Use ManhattanDiamondAnchor instead DiamondAnchor, because it calculates
+// lines to diamond sides, not rectangle around diamond
 var LibavoidDiamondAnchor = /** @class */ (function (_super) {
     __extends(LibavoidDiamondAnchor, _super);
     function LibavoidDiamondAnchor() {
@@ -56,6 +58,6 @@ var LibavoidDiamondAnchor = /** @class */ (function (_super) {
         configurable: true
     });
     return LibavoidDiamondAnchor;
-}(DiamondAnchor));
+}(ManhattanDiamondAnchor));
 export { LibavoidDiamondAnchor };
 //# sourceMappingURL=libavoid-router-anchors.js.map

@@ -269,6 +269,12 @@ export interface LibavoidRouterOptions {
   //! Defaults to true.
   //!
   nudgeSharedPathsWithCommonEndPoint?: boolean;
+
+  //! ...
+  //!
+  //! Defaults to 20.
+  //!
+  minimalSegmentLengthForChildPosition?: number;
 }
 
 // there are two types of configuration parameters in libavoid Router: parameter and option.
@@ -468,7 +474,7 @@ export class LibavoidRouter
     const route = connRef.displayRoute();
 
     const avoidRoute = [];
-    for (let i=0; i<route.size(); i++) {
+    for (let i = 0; i < route.size(); i++) {
       avoidRoute.push({ x: route.get_ps(i).x, y: route.get_ps(i).y });
     }
 
@@ -580,7 +586,7 @@ export class LibavoidRouter
           // correct way to resize)
           this.avoidRouter.moveShape(
             this.avoidShapes[child.id].ref,
-            newRectangle,
+            newRectangle
           );
           this.avoidShapes[child.id].bounds = {
             ...this.avoidShapes[child.id].bounds,
@@ -693,7 +699,7 @@ export class LibavoidRouter
         this.avoidConnRefsByEdgeId[edgeId],
         edgeById[edgeId]
       );
-    })
+    });
     this.changedEdgeIds = [];
     return this.edgeRouting;
   }
@@ -777,5 +783,72 @@ export class LibavoidRouter
       standardDistance: 20,
       selfEdgeOffset: 0.25,
     };
+  }
+
+  /**
+   * Calculation is similar as in original method, but `minimalSegmentLengthForChildPosition`
+   * parameter is introduced(see LibavoidRouterOptions.minimalSegmentLengthForChildPosition for 
+   * more details) to avoid getting very small segments, that has negative impact for example on
+   * placing edge children such as labels.
+   */
+  protected calculateSegment(
+    edge: LibavoidEdge,
+    t: number
+  ): { segmentStart: Point; segmentEnd: Point; lambda: number } | undefined {
+    const segments = super.calculateSegment(edge, t);
+
+    if (!segments) return undefined;
+    let { segmentStart, segmentEnd, lambda } = segments;
+    const segmentLength = Point.euclideanDistance(segmentStart, segmentEnd);
+    // avoid placing labels on very small segments
+    const minSegmentSize =
+      this.options.minimalSegmentLengthForChildPosition === undefined
+        ? 20
+        : this.options.minimalSegmentLengthForChildPosition;
+    if (segmentLength < minSegmentSize) {
+      const routedPoints = this.route(edge);
+      if (routedPoints.length < 2) return undefined;
+
+      // try to find longer segment before segmentStart
+      let found = false;
+      const segmentStartIndex = routedPoints.findIndex((point) =>
+        Point.equals(point, segmentStart)
+      );
+      for (let i = segmentStartIndex - 1; i >= 0; i--) {
+        const currentSegmentLength = Point.euclideanDistance(
+          routedPoints[i],
+          routedPoints[i + 1]
+        );
+        if (currentSegmentLength > minSegmentSize) {
+          segmentStart = routedPoints[i];
+          segmentEnd = routedPoints[i + 1];
+          lambda = 0.8;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        const segmentEndIndex = segmentStartIndex + 1;
+        if (segmentEndIndex < routedPoints.length - 1) {
+          // no long enough segment before segmentStart, try to find one after segmentEnd
+          for (let i = segmentEndIndex; i < routedPoints.length - 1; i++) {
+            const currentSegmentLength = Point.euclideanDistance(
+              routedPoints[i],
+              routedPoints[i + 1]
+            );
+            if (currentSegmentLength > minSegmentSize) {
+              segmentStart = routedPoints[i];
+              segmentEnd = routedPoints[i + 1];
+              lambda = 0.2;
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return { segmentStart, segmentEnd, lambda };
   }
 }

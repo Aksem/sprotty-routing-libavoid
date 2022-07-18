@@ -44,6 +44,7 @@ export interface LibavoidRouterOptions {
     performUnifyingNudgingPreprocessingStep?: boolean;
     improveHyperedgeRoutesMovingAddingAndDeletingJunctions?: boolean;
     nudgeSharedPathsWithCommonEndPoint?: boolean;
+    minimalSegmentLengthForChildPosition?: number;
 }
 export interface LibavoidRouteOptions {
     routeType?: RouteType;
@@ -85,6 +86,17 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
     applyInnerHandleMoves(edge: SRoutableElement, moves: ResolvedHandleMove[]): void;
     getInnerHandlePosition(edge: SRoutableElement, route: RoutedPoint[], handle: SRoutingHandle): Point | undefined;
     protected getOptions(edge: LibavoidEdge): LinearRouteOptions;
+    /**
+     * Calculation is similar as in original method, but `minimalSegmentLengthForChildPosition`
+     * parameter is introduced(see LibavoidRouterOptions.minimalSegmentLengthForChildPosition for
+     * more details) to avoid getting very small segments, that has negative impact for example on
+     * placing edge children such as labels.
+     */
+    protected calculateSegment(edge: LibavoidEdge, t: number): {
+        segmentStart: Point;
+        segmentEnd: Point;
+        lambda: number;
+    } | undefined;
 }
 export {};
 //# sourceMappingURL=libavoid-router.d.ts.map
