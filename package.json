@@ -1,6 +1,6 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.0.36",
+  "version": "1.0.38",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -23,22 +23,22 @@
     "url": "https://github.com/Aksem/sprotty-routing-libavoid"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.3",
-    "@babel/core": "^7.14.3",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/plugin-proposal-decorators": "^7.14.2",
-    "@babel/plugin-transform-typescript": "^7.14.4",
+    "@babel/cli": "^7.18.9",
+    "@babel/core": "^7.18.9",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-decorators": "^7.18.9",
+    "@babel/plugin-transform-typescript": "^7.18.8",
     "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.14.4",
-    "@babel/preset-typescript": "^7.13.0",
+    "@babel/preset-env": "^7.18.9",
+    "@babel/preset-typescript": "^7.18.6",
     "@types/chai": "^4.2.18",
     "@types/jest": "^26.0.23",
     "@types/mocha": "^8.2.2",
-    "@typescript-eslint/eslint-plugin": "^4.26.1",
-    "@typescript-eslint/parser": "^4.26.1",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.2.2",
-    "babel-preset-minify": "^0.5.0",
+    "babel-loader": "^8.2.5",
+    "babel-preset-minify": "^0.5.2",
     "chai": "^4.3.4",
     "css-loader": "^5.2.6",
     "eslint": "^7.28.0",
@@ -51,8 +51,8 @@
     "prettier-webpack-plugin": "^1.2.0",
     "style-loader": "^2.0.0",
     "terser-webpack-plugin": "^5.1.3",
-    "ts-loader": "^6.1.0",
-    "typescript": "^3.8.3",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
     "url-loader": "^4.1.1"
   },
   "jest": {
@@ -95,8 +95,8 @@
     ]
   },
   "dependencies": {
-    "inversify": "^5.0.1",
-    "libavoid-js": "^0.1.19",
+    "inversify": "^5.1.1",
+    "libavoid-js": "^0.1.20",
     "path-browserify": "^1.0.1",
     "reflect-metadata": "^0.1.13",
     "sprotty": "0.11.1"

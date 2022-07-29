@@ -676,6 +676,10 @@ export class LibavoidRouter
       }
 
       this.avoidConnRefsByEdgeId[edge.id] = connRef;
+
+      if (!routesChanged) {
+        routesChanged = true;
+      }
     }
 
     // check for deleted edges
@@ -684,6 +688,10 @@ export class LibavoidRouter
       if (!edgesIds.includes(oldEdgeId)) {
         this.avoidRouter.deleteConnector(this.avoidConnRefsByEdgeId[oldEdgeId]);
         delete this.avoidConnRefsByEdgeId[oldEdgeId];
+
+        if (!routesChanged) {
+          routesChanged = true;
+        }
       }
     }
 
