@@ -1,15 +1,14 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.0.38",
+  "version": "1.1.1",
   "description": "Libavoid-based routing feature for sprotty",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest --silent",
-    "coverage": "npm run test -- --coverage",
     "prepare": "npm run build",
-    "trypublish": "npm publish || true"
+    "trypublish": "npm publish || true",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Vladyslav Hnatiuk",
   "license": "MIT",
@@ -23,83 +22,17 @@
     "url": "https://github.com/Aksem/sprotty-routing-libavoid"
   },
   "devDependencies": {
-    "@babel/cli": "^7.18.9",
-    "@babel/core": "^7.18.9",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-decorators": "^7.18.9",
-    "@babel/plugin-transform-typescript": "^7.18.8",
-    "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.18.9",
-    "@babel/preset-typescript": "^7.18.6",
-    "@types/chai": "^4.2.18",
-    "@types/jest": "^26.0.23",
-    "@types/mocha": "^8.2.2",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.2.5",
-    "babel-preset-minify": "^0.5.2",
-    "chai": "^4.3.4",
-    "css-loader": "^5.2.6",
-    "eslint": "^7.28.0",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.3.1",
-    "jest": "^27.0.4",
-    "mini-css-extract-plugin": "^1.6.0",
-    "optimize-css-assets-webpack-plugin": "^6.0.0",
-    "prettier": "^2.3.1",
-    "prettier-webpack-plugin": "^1.2.0",
-    "style-loader": "^2.0.0",
-    "terser-webpack-plugin": "^5.1.3",
-    "ts-loader": "^9.3.1",
-    "typescript": "^4.7.4",
-    "url-loader": "^4.1.1"
-  },
-  "jest": {
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}",
-      "!src/index.js",
-      "!demo/index.js",
-      "!src/utils/**",
-      "!**/tests/**"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
-    ],
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
-      "^.+\\.module\\.(css|sass|scss)$"
-    ],
-    "modulePaths": [
-      "<rootDir>/src/"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/scripts/testMock.js",
-      "\\.(css|less)$": "<rootDir>/scripts/testMock.js"
-    },
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "web.ts",
-      "ts",
-      "web.tsx",
-      "tsx",
-      "json",
-      "web.jsx",
-      "jsx",
-      "node"
-    ]
+    "esbuild": "^0.17.19",
+    "eslint": "^8.41.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "inversify": "^5.1.1",
-    "libavoid-js": "^0.1.20",
-    "path-browserify": "^1.0.1",
+    "libavoid-js": "^0.3.3",
     "reflect-metadata": "^0.1.13",
-    "sprotty": "0.11.1"
+    "sprotty": "^0.11.1",
+    "sprotty-protocol": "^0.11.0"
   },
   "browser": {
     "fs": false,

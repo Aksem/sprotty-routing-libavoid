@@ -5,15 +5,81 @@
  
 </div>
 
-**Supported Sprotty versions:** 0.11
+**Supported Sprotty versions:** 0.11-0.13
 
 ## 📦 Getting Started
 
-```
-npm install --save sprotty-routing-libavoid
-```
+1. Install `sprotty-routing-libavoid` npm package.
 
+    ```sh
+    npm install --save sprotty-routing-libavoid
+    ```
 
+    1.1 Build systems don't recognize .wasm file as dependency, you need to include it in build manually. For instance run copy at the end of build process(e.g. esbuild-plugin-copy for esbuild) or just execute cp as the second subcommand of npm build script(or postbuild command), e.g:
 
-TODO:
-- move path-browserify and fs in libavoid-js
+    ```json
+    "postbuild": "cp -f ../../node_modules/libavoid-js/dist/libavoid.wasm ./dist/libavoid.wasm"
+    ```
+
+2. Load router before application start, e.g.:
+
+    ```javascript
+    import { load as loadLibavoidRouter } from 'sprotty-routing-libavoid';
+
+    loadLibavoidRouter().then(() => {
+        startApp(); // app start can vary, it just an example
+    })
+    ```
+
+    Note, that router loading is asynchronous, it's required because router uses WebAssembly and currently it can be loaded only asynchronously.
+
+3. Add LibavoidRouter and optionally anchors to the DI container.
+
+    ```javascript
+    import { TYPES } from 'sprotty';
+    import {
+        LibavoidDiamondAnchor,
+        LibavoidEllipseAnchor,
+        LibavoidRectangleAnchor,
+        LibavoidRouter,
+    } from 'sprotty-routing-libavoid';
+
+    bind(LibavoidRouter).toSelf().inSingletonScope();
+    bind(TYPES.IEdgeRouter).toService(LibavoidRouter);
+    bind(TYPES.IAnchorComputer).to(LibavoidDiamondAnchor).inSingletonScope();
+    bind(TYPES.IAnchorComputer).to(LibavoidEllipseAnchor).inSingletonScope();
+    bind(TYPES.IAnchorComputer).to(LibavoidRectangleAnchor).inSingletonScope();
+    ```
+
+4. Use LibavoidEdge as base class for edges that should be routed with `LibavoidRouter`. It's optional, but recommended because so you can pass additional parameters to edges supported by libavoid router.
+
+    ```javascript
+    import { LibavoidEdge } from 'sprotty-routing-libavoid';
+    import { PolylineEdgeView } from 'sprotty';
+
+    class CustomEdge extends LibavoidEdge {}
+
+    // in DI config:
+    configureModelElement(context, 'edge', CustomEdge, PolylineEdgeView);
+    ```
+
+5. Optionally customize configuration of `LibavoidRouter`:
+
+    ```javascript
+    const router = container.get(LibavoidRouter);
+    router.setOptions({
+        routingType: RouteType.Orthogonal,
+        segmentPenalty: 50,
+        idealNudgingDistance: 24,
+        shapeBufferDistance: 25,
+        nudgeOrthogonalSegmentsConnectedToShapes: true,
+        // allow or disallow moving edge end from center
+        nudgeOrthogonalTouchingColinearSegments: false
+    });
+    ```
+
+## Development
+
+Notes:
+
+- inversify [requires `reflect-metadata` and experimentalDecorators, emitDecoratorMetadata, types and lib compilation options in tsconfig.json](https://inversify.io/). Esbuild doesn't take these parameters(at least some of them) from tsconfig, because build created with esbuild doesn't work properly(injected classes cannot be resolved), that's why we still use tsc.

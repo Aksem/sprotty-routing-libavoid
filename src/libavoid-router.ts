@@ -280,9 +280,9 @@ export interface LibavoidRouterOptions {
 // there are two types of configuration parameters in libavoid Router: parameter and option.
 // For sprotty router they are unified as 'options', but their type in libavoid should be known
 // to set them in router
-const routerOptionType = {
+const routerOptionType: { [key: string]: string } = {
   // routingType is a custom option, not inherited from libavoid
-  routingType: undefined,
+  routingType: "custom",
   segmentPenalty: "parameter",
   anglePenalty: "parameter",
   crossingPenalty: "parameter",
@@ -322,7 +322,7 @@ export interface LibavoidRouteOptions {
 }
 
 export class LibavoidEdge extends SEdge implements LibavoidRouteOptions {
-  public readonly routerKind = LibavoidRouter.KIND;
+  override routerKind: string = LibavoidRouter.KIND;
   routeType = 0;
   sourceVisibleDirections = undefined;
   targetVisibleDirections = undefined;
@@ -338,7 +338,6 @@ export class LibavoidRouter
   avoidShapes: AvoidShapes;
   options: LibavoidRouterOptions;
   renderedTimes = 0;
-  firstRender: boolean;
   edgeRouting: EdgeRouting;
   changedEdgeIds: string[];
   static readonly KIND = "libavoid";
@@ -349,7 +348,6 @@ export class LibavoidRouter
     this.avoidShapes = {};
     this.options = {};
     this.edgeRouting = new EdgeRouting();
-    this.firstRender = true;
     this.changedEdgeIds = [];
 
     const Avoid: AvoidInterface =
@@ -426,8 +424,8 @@ export class LibavoidRouter
     refPoint: Point,
     refContainer: SParentElement,
     edge: SRoutableElement,
-    anchorCorrection: number = 0
-  ) {
+    anchorCorrection = 0
+  ): Point {
     let anchor = this.getTranslatedAnchor(
       connectable,
       refPoint,
@@ -534,10 +532,6 @@ export class LibavoidRouter
     const Avoid: AvoidInterface =
       AvoidLib.getInstance() as unknown as AvoidInterface;
     let routesChanged = false;
-    if (this.firstRender) {
-      this.firstRender = false;
-      return this.edgeRouting;
-    }
 
     // add shapes to libavoid router
     const connectables = this.getAllBoundsAwareChildren(parent);
@@ -640,7 +634,7 @@ export class LibavoidRouter
       }
     }
 
-    const edgeById = {};
+    const edgeById: { [key: string]: LibavoidEdge } = {};
     for (const edge of edges) {
       edgeById[edge.id] = edge;
       // check also source and target?
@@ -723,7 +717,25 @@ export class LibavoidRouter
     edge: Readonly<LibavoidEdge>,
     args?: Record<string, unknown>
   ): RoutedPoint[] {
-    return this.edgeRouting.get(edge.id) || [];
+    let route = this.edgeRouting.get(edge.id);
+    if (route === undefined) {
+      // edge cannot be routed yet(e.g. pre-rendering phase), but glsp server requires at least
+      // two points in route, connect source and target temporarily directly, it will be replaced
+      // on next iteration. See https://github.com/eclipse-glsp/glsp-server/blob/master/plugins/org.eclipse.glsp.server/src/org/eclipse/glsp/server/utils/LayoutUtil.java#L116
+      route = [
+        {
+          x: edge.source?.position.x || 0,
+          y: edge.source?.position.y || 0,
+          kind: "source",
+        },
+        {
+          x: edge.target?.position.x || 0,
+          y: edge.target?.position.y || 0,
+          kind: "target",
+        },
+      ];
+    }
+    return route;
   }
 
   createRoutingHandles(edge: SRoutableElement): void {
@@ -795,11 +807,11 @@ export class LibavoidRouter
 
   /**
    * Calculation is similar as in original method, but `minimalSegmentLengthForChildPosition`
-   * parameter is introduced(see LibavoidRouterOptions.minimalSegmentLengthForChildPosition for 
+   * parameter is introduced(see LibavoidRouterOptions.minimalSegmentLengthForChildPosition for
    * more details) to avoid getting very small segments, that has negative impact for example on
    * placing edge children such as labels.
    */
-  protected calculateSegment(
+  protected override calculateSegment(
     edge: LibavoidEdge,
     t: number
   ): { segmentStart: Point; segmentEnd: Point; lambda: number } | undefined {

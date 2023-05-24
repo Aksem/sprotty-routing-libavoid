@@ -1,10 +1,10 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
 import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement, SEdge } from "sprotty";
 import { Point, Bounds } from "sprotty-protocol";
-export declare type AvoidConnRefsByEdgeId = {
+export type AvoidConnRefsByEdgeId = {
     [key: string]: AvoidInterface["ConnRef"];
 };
-declare type AvoidShapes = {
+type AvoidShapes = {
     [key: string]: {
         ref: AvoidInterface["ShapeRef"];
         bounds: Bounds;
@@ -53,7 +53,7 @@ export interface LibavoidRouteOptions {
     hateCrossings?: boolean;
 }
 export declare class LibavoidEdge extends SEdge implements LibavoidRouteOptions {
-    readonly routerKind = "libavoid";
+    routerKind: string;
     routeType: number;
     sourceVisibleDirections: undefined;
     targetVisibleDirections: undefined;
@@ -65,7 +65,6 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
     avoidShapes: AvoidShapes;
     options: LibavoidRouterOptions;
     renderedTimes: number;
-    firstRender: boolean;
     edgeRouting: EdgeRouting;
     changedEdgeIds: string[];
     static readonly KIND = "libavoid";

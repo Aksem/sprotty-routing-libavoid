@@ -1,16 +1,20 @@
 import { AvoidLib } from "libavoid-js";
 import {
+  Directions,
+  LibavoidEdge,
+  LibavoidRouteOptions,
   LibavoidRouter,
   LibavoidRouterOptions,
-  LibavoidRouteOptions,
-  LibavoidEdge,
   RouteType,
-  Directions,
 } from "./libavoid-router";
-import { LibavoidEllipseAnchor, LibavoidDiamondAnchor, LibavoidRectangleAnchor } from "./libavoid-router-anchors";
+import {
+  LibavoidDiamondAnchor,
+  LibavoidEllipseAnchor,
+  LibavoidRectangleAnchor,
+} from "./libavoid-router-anchors";
 
-export async function load() {
-  await AvoidLib.load();
+export async function load(filePath: string | undefined = undefined) {
+  await AvoidLib.load(filePath);
 }
 
 export {
@@ -22,5 +26,5 @@ export {
   Directions,
   LibavoidEllipseAnchor,
   LibavoidDiamondAnchor,
-  LibavoidRectangleAnchor
+  LibavoidRectangleAnchor,
 };
