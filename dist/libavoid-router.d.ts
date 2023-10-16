@@ -1,64 +1,20 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
-import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement, SEdge } from "sprotty";
-import { Point, Bounds } from "sprotty-protocol";
+import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement } from "sprotty";
+import { Point } from "sprotty-protocol";
+import { LibavoidRouterOptions, RouteType, Directions } from "./libavoid-router-options";
+import { LibavoidEdge, LibavoidRouteOptions } from "./libavoid-edge";
+import { ShapeInfo } from "./connection-pins-utils";
+export { LibavoidRouterOptions, RouteType, Directions, LibavoidEdge, LibavoidRouteOptions };
 export type AvoidConnRefsByEdgeId = {
     [key: string]: AvoidInterface["ConnRef"];
 };
 type AvoidShapes = {
-    [key: string]: {
-        ref: AvoidInterface["ShapeRef"];
-        bounds: Bounds;
-    };
+    [key: string]: ShapeInfo;
 };
 export interface EdgeRoutesContainer {
     edgeRoutes: EdgeRouting;
 }
 export declare function containsEdgeRoutes(args?: Record<string, unknown>): args is Record<string, unknown> & EdgeRoutesContainer;
-export declare enum RouteType {
-    PolyLine = 1,
-    Orthogonal = 2
-}
-export declare enum Directions {
-    None = 0,
-    Up = 1,
-    Down = 2,
-    Left = 4,
-    Right = 8,
-    All = 15
-}
-export interface LibavoidRouterOptions {
-    routingType?: RouteType;
-    segmentPenalty?: number;
-    anglePenalty?: number;
-    crossingPenalty?: number;
-    clusterCrossingPenalty?: number;
-    fixedSharedPathPenalty?: number;
-    portDirectionPenalty?: number;
-    shapeBufferDistance?: number;
-    idealNudgingDistance?: number;
-    reverseDirectionPenalty?: number;
-    nudgeOrthogonalSegmentsConnectedToShapes?: boolean;
-    improveHyperedgeRoutesMovingJunctions?: boolean;
-    penaliseOrthogonalSharedPathsAtConnEnds?: boolean;
-    nudgeOrthogonalTouchingColinearSegments?: boolean;
-    performUnifyingNudgingPreprocessingStep?: boolean;
-    improveHyperedgeRoutesMovingAddingAndDeletingJunctions?: boolean;
-    nudgeSharedPathsWithCommonEndPoint?: boolean;
-    minimalSegmentLengthForChildPosition?: number;
-}
-export interface LibavoidRouteOptions {
-    routeType?: RouteType;
-    sourceVisibleDirections?: Directions;
-    targetVisibleDirections?: Directions;
-    hateCrossings?: boolean;
-}
-export declare class LibavoidEdge extends SEdge implements LibavoidRouteOptions {
-    routerKind: string;
-    routeType: number;
-    sourceVisibleDirections: undefined;
-    targetVisibleDirections: undefined;
-    hateCrossings: boolean;
-}
 export declare class LibavoidRouter extends AbstractEdgeRouter implements IMultipleEdgesRouter {
     avoidRouter: AvoidInterface["Router"];
     avoidConnRefsByEdgeId: AvoidConnRefsByEdgeId;
@@ -72,13 +28,11 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
     get kind(): string;
     setOptions(options: LibavoidRouterOptions): void;
     getAllBoundsAwareChildren(parent: Readonly<SParentElement>): SChildElement[];
-    getCenterPoint(element: SConnectableElement): {
-        x: number;
-        y: number;
-    };
     getFixedTranslatedAnchor(connectable: SConnectableElement, sourcePoint: Point, refPoint: Point, refContainer: SParentElement, edge: SRoutableElement, anchorCorrection?: number): Point;
     updateConnRefInEdgeRouting(connRef: AvoidInterface["ConnRef"], edge: LibavoidEdge): void;
     routeAll(edges: LibavoidEdge[], parent: SParentElement): EdgeRouting;
+    private handleModifiedShape;
+    private handleNewShape;
     destroy(): void;
     route(edge: Readonly<LibavoidEdge>, args?: Record<string, unknown>): RoutedPoint[];
     createRoutingHandles(edge: SRoutableElement): void;
@@ -97,5 +51,4 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
         lambda: number;
     } | undefined;
 }
-export {};
 //# sourceMappingURL=libavoid-router.d.ts.map

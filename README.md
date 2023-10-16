@@ -78,6 +78,12 @@
     });
     ```
 
+## Known limitations
+
+- if AnchorComputer returns anchors on sides of connectables on first rendering, then anchors are attached to sides of connectables
+  and it cannot be changed later even if AnchorComputer returns new values not on sides. This is because libavoid doesn't have
+  public API for changing type of anchor(absolute/relative) yet.
+
 ## Development
 
 Notes:
