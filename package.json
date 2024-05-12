@@ -31,8 +31,8 @@
     "inversify": "^5.1.1",
     "libavoid-js": "^0.4.0-beta.1",
     "reflect-metadata": "^0.1.13",
-    "sprotty": "^0.11.1",
-    "sprotty-protocol": "^0.11.0"
+    "sprotty": "^0.13.0",
+    "sprotty-protocol": "^0.13.0"
   },
   "browser": {
     "fs": false,
