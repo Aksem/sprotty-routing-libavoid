@@ -1,5 +1,5 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
-import { SRoutableElement, SRoutingHandle, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElement, SConnectableElement, SParentElement } from "sprotty";
+import { SRoutableElementImpl, SRoutingHandleImpl, RoutedPoint, ResolvedHandleMove, EdgeRouting, AbstractEdgeRouter, LinearRouteOptions, IMultipleEdgesRouter, SChildElementImpl, SConnectableElementImpl, SParentElementImpl } from "sprotty";
 import { Point } from "sprotty-protocol";
 import { LibavoidRouterOptions, RouteType, Directions } from "./libavoid-router-options";
 import { LibavoidEdge, LibavoidRouteOptions } from "./libavoid-edge";
@@ -27,17 +27,17 @@ export declare class LibavoidRouter extends AbstractEdgeRouter implements IMulti
     constructor();
     get kind(): string;
     setOptions(options: LibavoidRouterOptions): void;
-    getAllBoundsAwareChildren(parent: Readonly<SParentElement>): SChildElement[];
-    getFixedTranslatedAnchor(connectable: SConnectableElement, sourcePoint: Point, refPoint: Point, refContainer: SParentElement, edge: SRoutableElement, anchorCorrection?: number): Point;
+    getAllBoundsAwareChildren(parent: Readonly<SParentElementImpl>): SChildElementImpl[];
+    getFixedTranslatedAnchor(connectable: SConnectableElementImpl, sourcePoint: Point, refPoint: Point, refContainer: SParentElementImpl, edge: SRoutableElementImpl, anchorCorrection?: number): Point;
     updateConnRefInEdgeRouting(connRef: AvoidInterface["ConnRef"], edge: LibavoidEdge): void;
-    routeAll(edges: LibavoidEdge[], parent: SParentElement): EdgeRouting;
+    routeAll(edges: LibavoidEdge[], parent: SParentElementImpl): EdgeRouting;
     private handleModifiedShape;
     private handleNewShape;
     destroy(): void;
     route(edge: Readonly<LibavoidEdge>, args?: Record<string, unknown>): RoutedPoint[];
-    createRoutingHandles(edge: SRoutableElement): void;
-    applyInnerHandleMoves(edge: SRoutableElement, moves: ResolvedHandleMove[]): void;
-    getInnerHandlePosition(edge: SRoutableElement, route: RoutedPoint[], handle: SRoutingHandle): Point | undefined;
+    createRoutingHandles(edge: SRoutableElementImpl): void;
+    applyInnerHandleMoves(edge: SRoutableElementImpl, moves: ResolvedHandleMove[]): void;
+    getInnerHandlePosition(edge: SRoutableElementImpl, route: RoutedPoint[], handle: SRoutingHandleImpl): Point | undefined;
     protected getOptions(edge: LibavoidEdge): LinearRouteOptions;
     /**
      * Calculation is similar as in original method, but `minimalSegmentLengthForChildPosition`

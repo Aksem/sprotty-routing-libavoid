@@ -1,5 +1,5 @@
 import { AvoidLib } from "libavoid-js";
-import { SRoutingHandle, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElement, SParentElement, connectableFeature } from "sprotty";
+import { SRoutingHandleImpl, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElementImpl, SParentElementImpl, connectableFeature } from "sprotty";
 import { Point, centerOfLine } from "sprotty-protocol";
 import { RouteType, Directions, libavoidRouterKind, } from "./libavoid-router-options";
 import { LibavoidEdge } from "./libavoid-edge";
@@ -76,7 +76,7 @@ export class LibavoidRouter extends AbstractEdgeRouter {
             if (isBoundsAware(child)) {
                 result.push(child);
             }
-            if (child instanceof SParentElement) {
+            if (child instanceof SParentElementImpl) {
                 result.push(...this.getAllBoundsAwareChildren(child));
             }
         }
@@ -179,7 +179,7 @@ export class LibavoidRouter extends AbstractEdgeRouter {
         // add shapes to libavoid router
         const connectables = this.getAllBoundsAwareChildren(parent);
         for (const child of connectables) {
-            if (!(child instanceof SConnectableElement) || !child.hasFeature(connectableFeature)) {
+            if (!(child instanceof SConnectableElementImpl) || !child.hasFeature(connectableFeature)) {
                 continue;
             }
             if (child.bounds.width === -1) {
@@ -347,7 +347,7 @@ export class LibavoidRouter extends AbstractEdgeRouter {
                 handle.type = "routing-point";
                 points.splice(index + 1, 0, move.fromPosition || points[Math.max(index, 0)]);
                 edge.children.forEach((child) => {
-                    if (child instanceof SRoutingHandle &&
+                    if (child instanceof SRoutingHandleImpl &&
                         (child === handle || child.pointIndex > index))
                         child.pointIndex++;
                 });

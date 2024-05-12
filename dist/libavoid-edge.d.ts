@@ -1,4 +1,4 @@
-import { SEdge } from 'sprotty';
+import { SEdgeImpl } from 'sprotty';
 import { Directions, RouteType } from './libavoid-router-options';
 export interface LibavoidRouteOptions {
     routeType?: RouteType;
@@ -6,7 +6,7 @@ export interface LibavoidRouteOptions {
     targetVisibleDirections?: Directions;
     hateCrossings?: boolean;
 }
-export declare class LibavoidEdge extends SEdge implements LibavoidRouteOptions {
+export declare class LibavoidEdge extends SEdgeImpl implements LibavoidRouteOptions {
     routerKind: string;
     routeType: number;
     sourceVisibleDirections: undefined;

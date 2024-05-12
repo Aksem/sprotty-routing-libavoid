@@ -1,7 +1,7 @@
 import { Avoid as AvoidInterface, AvoidLib } from "libavoid-js";
 import {
-  SRoutableElement,
-  SRoutingHandle,
+  SRoutableElementImpl,
+  SRoutingHandleImpl,
   RoutedPoint,
   ResolvedHandleMove,
   EdgeRouting,
@@ -9,9 +9,9 @@ import {
   LinearRouteOptions,
   IMultipleEdgesRouter,
   isBoundsAware,
-  SChildElement,
-  SConnectableElement,
-  SParentElement,
+  SChildElementImpl,
+  SConnectableElementImpl,
+  SParentElementImpl,
   connectableFeature
 } from "sprotty";
 import { Point, Bounds, centerOfLine } from "sprotty-protocol";
@@ -136,7 +136,7 @@ export class LibavoidRouter
     });
   }
 
-  getAllBoundsAwareChildren(parent: Readonly<SParentElement>): SChildElement[] {
+  getAllBoundsAwareChildren(parent: Readonly<SParentElementImpl>): SChildElementImpl[] {
     const result = [];
 
     for (const child of parent.children) {
@@ -144,7 +144,7 @@ export class LibavoidRouter
         result.push(child);
       }
 
-      if (child instanceof SParentElement) {
+      if (child instanceof SParentElementImpl) {
         result.push(...this.getAllBoundsAwareChildren(child));
       }
     }
@@ -153,11 +153,11 @@ export class LibavoidRouter
   }
 
   getFixedTranslatedAnchor(
-    connectable: SConnectableElement,
+    connectable: SConnectableElementImpl,
     sourcePoint: Point,
     refPoint: Point,
-    refContainer: SParentElement,
-    edge: SRoutableElement,
+    refContainer: SParentElementImpl,
+    edge: SRoutableElementImpl,
     anchorCorrection = 0
   ): Point {
     let anchor = this.getTranslatedAnchor(
@@ -278,7 +278,7 @@ export class LibavoidRouter
     this.edgeRouting.set(edge.id, sprottyRoute);
   }
 
-  routeAll(edges: LibavoidEdge[], parent: SParentElement): EdgeRouting {
+  routeAll(edges: LibavoidEdge[], parent: SParentElementImpl): EdgeRouting {
     const Avoid: AvoidInterface =
       AvoidLib.getInstance() as unknown as AvoidInterface;
     let routesChanged = false;
@@ -286,7 +286,7 @@ export class LibavoidRouter
     // add shapes to libavoid router
     const connectables = this.getAllBoundsAwareChildren(parent);
     for (const child of connectables) {
-      if (!(child instanceof SConnectableElement) || !child.hasFeature(connectableFeature)) {
+      if (!(child instanceof SConnectableElementImpl) || !child.hasFeature(connectableFeature)) {
         continue;
       }
       if (child.bounds.width === -1) {
@@ -395,7 +395,7 @@ export class LibavoidRouter
   }
 
   private handleModifiedShape(
-    child: SConnectableElement,
+    child: SConnectableElementImpl,
     Avoid: AvoidInterface
   ): boolean {
     let routesChanged = false;
@@ -445,7 +445,7 @@ export class LibavoidRouter
     return routesChanged;
   }
 
-  private handleNewShape(child: SConnectableElement, Avoid: AvoidInterface) {
+  private handleNewShape(child: SConnectableElementImpl, Avoid: AvoidInterface) {
     // new shape
     const centerPoint = getCenterPoint(child);
     const rectangle = new Avoid.Rectangle(
@@ -501,7 +501,7 @@ export class LibavoidRouter
     return route;
   }
 
-  createRoutingHandles(edge: SRoutableElement): void {
+  createRoutingHandles(edge: SRoutableElementImpl): void {
     const rpCount = edge.routingPoints.length;
     this.addHandle(edge, "source", "routing-point", -2);
     this.addHandle(edge, "line", "volatile-routing-point", -1);
@@ -512,7 +512,7 @@ export class LibavoidRouter
     this.addHandle(edge, "target", "routing-point", rpCount);
   }
 
-  applyInnerHandleMoves(edge: SRoutableElement, moves: ResolvedHandleMove[]) {
+  applyInnerHandleMoves(edge: SRoutableElementImpl, moves: ResolvedHandleMove[]) {
     moves.forEach((move) => {
       const handle = move.handle;
       const points = edge.routingPoints;
@@ -528,7 +528,7 @@ export class LibavoidRouter
         );
         edge.children.forEach((child) => {
           if (
-            child instanceof SRoutingHandle &&
+            child instanceof SRoutingHandleImpl &&
             (child === handle || child.pointIndex > index)
           )
             child.pointIndex++;
@@ -544,9 +544,9 @@ export class LibavoidRouter
   }
 
   getInnerHandlePosition(
-    edge: SRoutableElement,
+    edge: SRoutableElementImpl,
     route: RoutedPoint[],
-    handle: SRoutingHandle
+    handle: SRoutingHandleImpl
   ) {
     if (handle.kind === "line") {
       const { start, end } = this.findRouteSegment(

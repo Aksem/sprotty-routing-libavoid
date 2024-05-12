@@ -231,10 +231,10 @@ argparse@^2.0.1:
   resolved "https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz"
   integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
-autocompleter@^7.0.1:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/autocompleter/-/autocompleter-7.1.0.tgz#f8ff1428ec976eddc3eb8df7a2842c287d9b2bf5"
-  integrity sha512-uCToOnq7eAD/GJAteDbYuQ7ksDtrYWOy5CIAq43wh0dT+5frMpPlyD9tp+y5fz8KIcsP+zR2MjzoTAdW5aJESw==
+autocompleter@^9.1.2:
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/autocompleter/-/autocompleter-9.2.1.tgz#af24b3bc5d68b209ce43e2c4980706e7313f2714"
+  integrity sha512-lZVD5JZxxg3o6hnh7oB3M4kVAJPp/xFKmrO9RYeMGpFIH1XokmwevMLzSYz0BHSAbXMX6H3hEMsDxAd2dMebag==
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -558,12 +558,7 @@ inherits@2:
   resolved "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
-inversify@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.npmjs.org/inversify/-/inversify-5.1.1.tgz"
-  integrity sha512-j8grHGDzv1v+8T1sAQ+3boTCntFPfvxLCkNcxB1J8qA0lUN+fAlSyYd+RXKvaPRL4AGyPxViutBEJHNXOyUdFQ==
-
-inversify@^6.0.1:
+inversify@^6.0.1, inversify@~6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/inversify/-/inversify-6.0.2.tgz#dc7fa0348213d789d35ffb719dea9685570989c7"
   integrity sha512-i9m8j/7YIv4mDuYXUAcrpKPSaju/CIly9AHK5jvCBeoiM/2KEsuCQTTP+rzSWWpLYWRukdXFSl6ZTk2/uumbiA==
@@ -777,26 +772,26 @@ shebang-regex@^3.0.0:
   resolved "https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-snabbdom@^3.5.1:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-3.6.2.tgz#57dd66878f6320497fa7f67941df356a045c75a1"
-  integrity sha512-ig5qOnCDbugFntKi6c7Xlib8bA6xiJVk8O+WdFrV3wxbMqeHO0hXFQC4nAhPVWfZfi8255lcZkNhtIBINCc4+Q==
+snabbdom@~3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-3.5.1.tgz#25f80ef15b194baea703d9d5441892e369de18e1"
+  integrity sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==
 
-sprotty-protocol@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/sprotty-protocol/-/sprotty-protocol-0.13.0.tgz#ccd04a65b66f324bd847b8f55783f9fcd3df8129"
-  integrity sha512-yOaah3BNDwso6gS1yo/ceh+g/KOHeWLbajGiiyz9ngWLV4UUyP9VOWXN8jFI57k/0iAF5qhHTI7nkAeTqHFdLA==
+sprotty-protocol@^1.0.0, sprotty-protocol@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sprotty-protocol/-/sprotty-protocol-1.2.0.tgz#cfd6d637f2670a3d641997bb5add27cb1bddb57a"
+  integrity sha512-SHu61Qiw7bAD2nyRqdOASSihVNbeEuKI7cQx+o9EeyLpbmXKX6NTcGSVpxmWztHUIP0I6gZhKnkhF/BWo46mUQ==
 
-sprotty@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/sprotty/-/sprotty-0.13.0.tgz#d704211a8fbdecf4c82ece1b276ad83b06a4e8ec"
-  integrity sha512-XA5GV1IhdqBcdQn14qXUy9vQ/cDe/az6+gANOIA+LWrI+5iYH8hoEwbkXILJnWyV/a9T/66IP9sEQ8U0g90o0Q==
+sprotty@^1.0.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sprotty/-/sprotty-1.2.0.tgz#6c377b36fc6d410bcb65aff0d3893076f84bc8d8"
+  integrity sha512-/YL1+S+pLhV+hF0Z9C4vQGuaVv9NVsDgEqRnF+vevvdbeio1w8lfGxOMKjzY7DHcVDBQoKe0kbKJXvMr3f/RsA==
   dependencies:
-    autocompleter "^7.0.1"
+    autocompleter "^9.1.2"
     file-saver "^2.0.5"
-    inversify "^5.1.1"
-    snabbdom "^3.5.1"
-    sprotty-protocol "^0.13.0"
+    inversify "~6.0.2"
+    snabbdom "~3.5.1"
+    sprotty-protocol "^1.2.0"
     tinyqueue "^2.0.3"
 
 strip-ansi@^6.0.1:

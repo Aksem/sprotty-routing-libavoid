@@ -1,8 +1,8 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
 import {
-  SConnectableElement,
+  SConnectableElementImpl,
   translatePoint,
-  SParentElement,
+  SParentElementImpl,
   IAnchorComputer,
 } from "sprotty";
 import { Point, Bounds } from "sprotty-protocol";
@@ -27,9 +27,9 @@ export type ShapeInfo = {
 };
 
 export function getRelativeAnchor(
-  connectable: SConnectableElement,
+  connectable: SConnectableElementImpl,
   refPoint: Point,
-  refContainer: SParentElement,
+  refContainer: SParentElementImpl,
   anchorComputer: IAnchorComputer,
   anchorCorrection: number = 0
 ): Point {
@@ -52,7 +52,7 @@ export function getRelativeAnchor(
 
 export function addConnectionPinsToShape(
   shapeRef: AvoidInterface["ShapeRef"],
-  child: SConnectableElement,
+  child: SConnectableElementImpl,
   centerPoint: Point,
   anchorComputer: IAnchorComputer,
   Avoid: AvoidInterface
@@ -165,7 +165,7 @@ export function addConnectionPinsToShape(
   };
 }
 
-export function getCenterPoint(element: SConnectableElement): {
+export function getCenterPoint(element: SConnectableElementImpl): {
   x: number;
   y: number;
 } {
@@ -179,7 +179,7 @@ export function getCenterPoint(element: SConnectableElement): {
     }
 
     if (!(currentElement.parent && currentElement.parent.id === "graph")) {
-      currentElement = currentElement.parent as SConnectableElement;
+      currentElement = currentElement.parent as SConnectableElementImpl;
     } else {
       break;
     }
@@ -188,7 +188,7 @@ export function getCenterPoint(element: SConnectableElement): {
 }
 
 export function updateConnPinsOnShapeResize(
-  child: SConnectableElement,
+  child: SConnectableElementImpl,
   shapeInfo: ShapeInfo,
   anchorComputer: IAnchorComputer,
   Avoid: AvoidInterface

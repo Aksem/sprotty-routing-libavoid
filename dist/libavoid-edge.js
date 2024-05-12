@@ -1,6 +1,6 @@
-import { SEdge } from 'sprotty';
+import { SEdgeImpl } from 'sprotty';
 import { libavoidRouterKind } from './libavoid-router-options';
-export class LibavoidEdge extends SEdge {
+export class LibavoidEdge extends SEdgeImpl {
     constructor() {
         super(...arguments);
         this.routerKind = libavoidRouterKind;

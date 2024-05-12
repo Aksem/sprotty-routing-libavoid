@@ -1,5 +1,5 @@
 import { Avoid as AvoidInterface } from "libavoid-js";
-import { SConnectableElement, SParentElement, IAnchorComputer } from "sprotty";
+import { SConnectableElementImpl, SParentElementImpl, IAnchorComputer } from "sprotty";
 import { Point, Bounds } from "sprotty-protocol";
 export type ShapeConnPinsInfo = {
     left: AvoidInterface["ShapeConnectionPin"];
@@ -17,11 +17,11 @@ export type ShapeInfo = {
     bounds: Bounds;
     connPins: ShapeConnPinsInfo;
 };
-export declare function getRelativeAnchor(connectable: SConnectableElement, refPoint: Point, refContainer: SParentElement, anchorComputer: IAnchorComputer, anchorCorrection?: number): Point;
-export declare function addConnectionPinsToShape(shapeRef: AvoidInterface["ShapeRef"], child: SConnectableElement, centerPoint: Point, anchorComputer: IAnchorComputer, Avoid: AvoidInterface): ShapeConnPinsInfo;
-export declare function getCenterPoint(element: SConnectableElement): {
+export declare function getRelativeAnchor(connectable: SConnectableElementImpl, refPoint: Point, refContainer: SParentElementImpl, anchorComputer: IAnchorComputer, anchorCorrection?: number): Point;
+export declare function addConnectionPinsToShape(shapeRef: AvoidInterface["ShapeRef"], child: SConnectableElementImpl, centerPoint: Point, anchorComputer: IAnchorComputer, Avoid: AvoidInterface): ShapeConnPinsInfo;
+export declare function getCenterPoint(element: SConnectableElementImpl): {
     x: number;
     y: number;
 };
-export declare function updateConnPinsOnShapeResize(child: SConnectableElement, shapeInfo: ShapeInfo, anchorComputer: IAnchorComputer, Avoid: AvoidInterface): void;
+export declare function updateConnPinsOnShapeResize(child: SConnectableElementImpl, shapeInfo: ShapeInfo, anchorComputer: IAnchorComputer, Avoid: AvoidInterface): void;
 //# sourceMappingURL=connection-pins-utils.d.ts.map
