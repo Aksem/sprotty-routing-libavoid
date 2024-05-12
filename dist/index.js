@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { AvoidLib } from "libavoid-js";
 import { Directions, LibavoidEdge, LibavoidRouter, RouteType, } from "./libavoid-router";
 import { LibavoidDiamondAnchor, LibavoidEllipseAnchor, LibavoidRectangleAnchor, } from "./libavoid-router-anchors";
-export function load(filePath = undefined) {
-    return __awaiter(this, void 0, void 0, function* () {
+export function load() {
+    return __awaiter(this, arguments, void 0, function* (filePath = undefined) {
         yield AvoidLib.load(filePath);
     });
 }

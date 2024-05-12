@@ -37,7 +37,7 @@ const sizeIsEqual = (bounds1, bounds2) => {
 const positionIsEqual = (bounds1, bounds2) => {
     return bounds1.x === bounds2.x && bounds1.y === bounds2.y;
 };
-class LibavoidRouter extends AbstractEdgeRouter {
+export class LibavoidRouter extends AbstractEdgeRouter {
     constructor() {
         super();
         this.renderedTimes = 0;
@@ -429,5 +429,4 @@ class LibavoidRouter extends AbstractEdgeRouter {
     }
 }
 LibavoidRouter.KIND = libavoidRouterKind;
-export { LibavoidRouter };
 //# sourceMappingURL=libavoid-router.js.map
