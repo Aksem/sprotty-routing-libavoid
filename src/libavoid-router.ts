@@ -12,7 +12,8 @@ import {
   SChildElementImpl,
   SConnectableElementImpl,
   SParentElementImpl,
-  connectableFeature
+  connectableFeature,
+  SShapeElementImpl
 } from "sprotty";
 import { Point, Bounds, centerOfLine } from "sprotty-protocol";
 import {
@@ -331,12 +332,20 @@ export class LibavoidRouter
       if (edge.routeType == RouteType.PolyLine) {
         classId = 2;
       }
+      const sourceShape = this.avoidShapes[edge.sourceId];
+      if (!sourceShape) {
+        continue;
+      }
       const sourceConnEnd = new Avoid.ConnEnd(
-        this.avoidShapes[edge.sourceId].ref,
+        sourceShape.ref,
         classId
       );
+      const targetShape = this.avoidShapes[edge.targetId];
+      if (!targetShape) {
+        continue;
+      }
       const targetConnEnd = new Avoid.ConnEnd(
-        this.avoidShapes[edge.targetId].ref,
+        targetShape.ref,
         classId
       );
       const connRef = new Avoid.ConnRef(

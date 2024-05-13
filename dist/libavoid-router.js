@@ -1,5 +1,7 @@
 import { AvoidLib } from "libavoid-js";
-import { SRoutingHandleImpl, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElementImpl, SParentElementImpl, connectableFeature } from "sprotty";
+import { SRoutingHandleImpl, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElementImpl, 
+// isConnectable,
+SParentElementImpl, connectableFeature, SShapeElementImpl } from "sprotty";
 import { Point, centerOfLine } from "sprotty-protocol";
 import { RouteType, Directions, libavoidRouterKind, } from "./libavoid-router-options";
 import { LibavoidEdge } from "./libavoid-edge";
@@ -171,14 +173,17 @@ export class LibavoidRouter extends AbstractEdgeRouter {
             };
         }
         sprottyRoute.push(Object.assign({ kind: "target" }, targetAnchor));
+        console.log('route', edge.id, sprottyRoute);
         this.edgeRouting.set(edge.id, sprottyRoute);
     }
     routeAll(edges, parent) {
+        console.log('route all');
         const Avoid = AvoidLib.getInstance();
         let routesChanged = false;
         // add shapes to libavoid router
         const connectables = this.getAllBoundsAwareChildren(parent);
         for (const child of connectables) {
+            console.log(child, child instanceof SConnectableElementImpl, child instanceof SShapeElementImpl);
             if (!(child instanceof SConnectableElementImpl) || !child.hasFeature(connectableFeature)) {
                 continue;
             }
@@ -221,8 +226,16 @@ export class LibavoidRouter extends AbstractEdgeRouter {
             if (edge.routeType == RouteType.PolyLine) {
                 classId = 2;
             }
-            const sourceConnEnd = new Avoid.ConnEnd(this.avoidShapes[edge.sourceId].ref, classId);
-            const targetConnEnd = new Avoid.ConnEnd(this.avoidShapes[edge.targetId].ref, classId);
+            const sourceShape = this.avoidShapes[edge.sourceId];
+            if (!sourceShape) {
+                continue;
+            }
+            const sourceConnEnd = new Avoid.ConnEnd(sourceShape.ref, classId);
+            const targetShape = this.avoidShapes[edge.targetId];
+            if (!targetShape) {
+                continue;
+            }
+            const targetConnEnd = new Avoid.ConnEnd(targetShape.ref, classId);
             const connRef = new Avoid.ConnRef(this.avoidRouter, sourceConnEnd, targetConnEnd);
             connRef.setCallback(() => {
                 // save only edge id, because edge object can be changed til callback call
@@ -306,6 +319,7 @@ export class LibavoidRouter extends AbstractEdgeRouter {
     }
     route(edge, args) {
         var _a, _b, _c, _d;
+        console.log('route single', edge);
         let route = this.edgeRouting.get(edge.id);
         if (route === undefined) {
             // edge cannot be routed yet(e.g. pre-rendering phase), but glsp server requires at least
