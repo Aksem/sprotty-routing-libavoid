@@ -1,24 +1,13 @@
 import { AvoidLib } from "libavoid-js";
-import { SRoutableElement, SRoutingHandle, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SParentElement, SLabel, SCompartment, SPort, SEdge, SButton, } from "sprotty";
+import { SRoutingHandleImpl, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElementImpl, SParentElementImpl, connectableFeature, } from "sprotty";
 import { Point, centerOfLine } from "sprotty-protocol";
+import { RouteType, Directions, libavoidRouterKind, } from "./libavoid-router-options";
+import { LibavoidEdge } from "./libavoid-edge";
+import { addConnectionPinsToShape, getCenterPoint, updateConnPinsOnShapeResize, } from "./connection-pins-utils";
+export { RouteType, Directions, LibavoidEdge };
 export function containsEdgeRoutes(args) {
     return args !== undefined && "edgeRoutes" in args;
 }
-export var RouteType;
-(function (RouteType) {
-    RouteType[RouteType["PolyLine"] = 1] = "PolyLine";
-    RouteType[RouteType["Orthogonal"] = 2] = "Orthogonal";
-})(RouteType || (RouteType = {}));
-// equal to ConnDirFlag in libavoid
-export var Directions;
-(function (Directions) {
-    Directions[Directions["None"] = 0] = "None";
-    Directions[Directions["Up"] = 1] = "Up";
-    Directions[Directions["Down"] = 2] = "Down";
-    Directions[Directions["Left"] = 4] = "Left";
-    Directions[Directions["Right"] = 8] = "Right";
-    Directions[Directions["All"] = 15] = "All";
-})(Directions || (Directions = {}));
 // there are two types of configuration parameters in libavoid Router: parameter and option.
 // For sprotty router they are unified as 'options', but their type in libavoid should be known
 // to set them in router
@@ -48,17 +37,7 @@ const sizeIsEqual = (bounds1, bounds2) => {
 const positionIsEqual = (bounds1, bounds2) => {
     return bounds1.x === bounds2.x && bounds1.y === bounds2.y;
 };
-export class LibavoidEdge extends SEdge {
-    constructor() {
-        super(...arguments);
-        this.routerKind = LibavoidRouter.KIND;
-        this.routeType = 0;
-        this.sourceVisibleDirections = undefined;
-        this.targetVisibleDirections = undefined;
-        this.hateCrossings = false;
-    }
-}
-class LibavoidRouter extends AbstractEdgeRouter {
+export class LibavoidRouter extends AbstractEdgeRouter {
     constructor() {
         super();
         this.renderedTimes = 0;
@@ -97,28 +76,11 @@ class LibavoidRouter extends AbstractEdgeRouter {
             if (isBoundsAware(child)) {
                 result.push(child);
             }
-            if (child instanceof SParentElement) {
+            if (child instanceof SParentElementImpl) {
                 result.push(...this.getAllBoundsAwareChildren(child));
             }
         }
         return result;
-    }
-    getCenterPoint(element) {
-        let x = element.bounds.width / 2, y = element.bounds.height / 2;
-        let currentElement = element;
-        while (currentElement) {
-            if (currentElement.position) {
-                x += currentElement.position.x;
-                y += currentElement.position.y;
-            }
-            if (!(currentElement.parent && currentElement.parent.id === "graph")) {
-                currentElement = currentElement.parent;
-            }
-            else {
-                break;
-            }
-        }
-        return { x, y };
     }
     getFixedTranslatedAnchor(connectable, sourcePoint, refPoint, refContainer, edge, anchorCorrection = 0) {
         let anchor = this.getTranslatedAnchor(connectable, refPoint, refContainer, edge, anchorCorrection);
@@ -158,38 +120,56 @@ class LibavoidRouter extends AbstractEdgeRouter {
         for (let i = 0; i < route.size(); i++) {
             avoidRoute.push({ x: route.get_ps(i).x, y: route.get_ps(i).y });
         }
-        const sourcePointForSourceAnchor = {
-            x: route.get_ps(0).x,
-            y: route.get_ps(0).y,
-        };
-        const targetPointForSourceAnchor = {
-            x: route.get_ps(1).x,
-            y: route.get_ps(1).y,
-        };
-        const sourceAnchor = this.getFixedTranslatedAnchor(edge.source, sourcePointForSourceAnchor, targetPointForSourceAnchor, edge.parent, edge, edge.sourceAnchorCorrection);
+        let sourceAnchor;
+        if (edge.routeType == RouteType.PolyLine) {
+            const sourcePointForSourceAnchor = {
+                x: avoidRoute[0].x,
+                y: avoidRoute[0].y,
+            };
+            const targetPointForSourceAnchor = {
+                x: avoidRoute[1].x,
+                y: avoidRoute[1].y,
+            };
+            sourceAnchor = this.getFixedTranslatedAnchor(edge.source, sourcePointForSourceAnchor, targetPointForSourceAnchor, edge.parent, edge, edge.sourceAnchorCorrection);
+        }
+        else {
+            sourceAnchor = {
+                x: avoidRoute[0].x,
+                y: avoidRoute[0].y,
+            };
+        }
         sprottyRoute.push(Object.assign({ kind: "source" }, sourceAnchor));
-        for (let i = 0; i < route.size(); i++) {
+        for (let i = 0; i < avoidRoute.length; i++) {
             // source and target points are set below separately as anchors
-            if (i === 0 || i === route.size() - 1) {
+            if (i === 0 || i === avoidRoute.length - 1) {
                 continue;
             }
             const point = {
-                x: route.get_ps(i).x,
-                y: route.get_ps(i).y,
+                x: avoidRoute[i].x,
+                y: avoidRoute[i].y,
                 kind: "linear",
                 pointIndex: i,
             };
             sprottyRoute.push(point);
         }
-        const sourcePointForTargetAnchor = {
-            x: route.get_ps(route.size() - 1).x,
-            y: route.get_ps(route.size() - 1).y,
-        };
-        const targetPointForTargetAnchor = {
-            x: route.get_ps(route.size() - 2).x,
-            y: route.get_ps(route.size() - 2).y,
-        };
-        const targetAnchor = this.getFixedTranslatedAnchor(edge.target, sourcePointForTargetAnchor, targetPointForTargetAnchor, edge.parent, edge, edge.targetAnchorCorrection);
+        let targetAnchor;
+        if (edge.routeType == RouteType.PolyLine) {
+            const sourcePointForTargetAnchor = {
+                x: avoidRoute[avoidRoute.length - 1].x,
+                y: avoidRoute[avoidRoute.length - 1].y,
+            };
+            const targetPointForTargetAnchor = {
+                x: avoidRoute[avoidRoute.length - 2].x,
+                y: avoidRoute[avoidRoute.length - 2].y,
+            };
+            targetAnchor = this.getFixedTranslatedAnchor(edge.target, sourcePointForTargetAnchor, targetPointForTargetAnchor, edge.parent, edge, edge.targetAnchorCorrection);
+        }
+        else {
+            targetAnchor = {
+                x: avoidRoute[avoidRoute.length - 1].x,
+                y: avoidRoute[avoidRoute.length - 1].y,
+            };
+        }
         sprottyRoute.push(Object.assign({ kind: "target" }, targetAnchor));
         this.edgeRouting.set(edge.id, sprottyRoute);
     }
@@ -199,12 +179,7 @@ class LibavoidRouter extends AbstractEdgeRouter {
         // add shapes to libavoid router
         const connectables = this.getAllBoundsAwareChildren(parent);
         for (const child of connectables) {
-            if (child instanceof SRoutableElement ||
-                child instanceof SLabel ||
-                child instanceof SCompartment ||
-                child instanceof SPort ||
-                child instanceof SButton) {
-                // skip edges and labels
+            if (!(child instanceof SConnectableElementImpl) || !child.hasFeature(connectableFeature)) {
                 continue;
             }
             if (child.bounds.width === -1) {
@@ -214,37 +189,11 @@ class LibavoidRouter extends AbstractEdgeRouter {
             if (child.id in this.avoidShapes) {
                 // shape is modified or unchanged
                 // if modified: size or/and position
-                if (!positionIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
-                    this.avoidRouter.moveShape(this.avoidShapes[child.id].ref, child.bounds.x - this.avoidShapes[child.id].bounds.x, child.bounds.y - this.avoidShapes[child.id].bounds.y);
-                    this.avoidShapes[child.id].bounds = Object.assign(Object.assign({}, this.avoidShapes[child.id].bounds), { x: child.bounds.x, y: child.bounds.y });
-                    if (!routesChanged) {
-                        routesChanged = true;
-                    }
-                }
-                if (!sizeIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
-                    // shape size changed
-                    const centerPoint = this.getCenterPoint(child);
-                    const newRectangle = new Avoid.Rectangle(new Avoid.Point(centerPoint.x, centerPoint.y), child.bounds.width, child.bounds.height);
-                    // moveShape can not only move element, but also resize it(it's only one
-                    // correct way to resize)
-                    this.avoidRouter.moveShape(this.avoidShapes[child.id].ref, newRectangle);
-                    this.avoidShapes[child.id].bounds = Object.assign(Object.assign({}, this.avoidShapes[child.id].bounds), { width: child.bounds.width, height: child.bounds.height });
-                    if (!routesChanged) {
-                        routesChanged = true;
-                    }
-                }
+                routesChanged = routesChanged || this.handleModifiedShape(child, Avoid);
             }
             else {
                 // new shape
-                const centerPoint = this.getCenterPoint(child);
-                const rectangle = new Avoid.Rectangle(new Avoid.Point(centerPoint.x, centerPoint.y), child.bounds.width, child.bounds.height);
-                const shapeRef = new Avoid.ShapeRef(this.avoidRouter, rectangle);
-                const shapeCenterPin = new Avoid.ShapeConnectionPin(shapeRef, 1, 0.5, 0.5, true, 0, Directions.All);
-                shapeCenterPin.setExclusive(false);
-                this.avoidShapes[child.id] = {
-                    ref: shapeRef,
-                    bounds: Object.assign({}, child.bounds),
-                };
+                this.handleNewShape(child, Avoid);
                 if (!routesChanged) {
                     routesChanged = true;
                 }
@@ -268,9 +217,20 @@ class LibavoidRouter extends AbstractEdgeRouter {
             if (edge.id in this.avoidConnRefsByEdgeId) {
                 continue;
             }
-            // TODO: pins visible directions
-            const sourceConnEnd = new Avoid.ConnEnd(this.avoidShapes[edge.sourceId].ref, 1);
-            const targetConnEnd = new Avoid.ConnEnd(this.avoidShapes[edge.targetId].ref, 1);
+            let classId = 1;
+            if (edge.routeType == RouteType.PolyLine) {
+                classId = 2;
+            }
+            const sourceShape = this.avoidShapes[edge.sourceId];
+            if (!sourceShape) {
+                continue;
+            }
+            const sourceConnEnd = new Avoid.ConnEnd(sourceShape.ref, classId);
+            const targetShape = this.avoidShapes[edge.targetId];
+            if (!targetShape) {
+                continue;
+            }
+            const targetConnEnd = new Avoid.ConnEnd(targetShape.ref, classId);
             const connRef = new Avoid.ConnRef(this.avoidRouter, sourceConnEnd, targetConnEnd);
             connRef.setCallback(() => {
                 // save only edge id, because edge object can be changed til callback call
@@ -310,6 +270,42 @@ class LibavoidRouter extends AbstractEdgeRouter {
         });
         this.changedEdgeIds = [];
         return this.edgeRouting;
+    }
+    handleModifiedShape(child, Avoid) {
+        let routesChanged = false;
+        if (!positionIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
+            this.avoidRouter.moveShape(this.avoidShapes[child.id].ref, child.bounds.x - this.avoidShapes[child.id].bounds.x, child.bounds.y - this.avoidShapes[child.id].bounds.y);
+            this.avoidShapes[child.id].bounds = Object.assign(Object.assign({}, this.avoidShapes[child.id].bounds), { x: child.bounds.x, y: child.bounds.y });
+            if (!routesChanged) {
+                routesChanged = true;
+            }
+        }
+        if (!sizeIsEqual(child.bounds, this.avoidShapes[child.id].bounds)) {
+            // shape size changed
+            const centerPoint = getCenterPoint(child);
+            const newRectangle = new Avoid.Rectangle(new Avoid.Point(centerPoint.x, centerPoint.y), child.bounds.width, child.bounds.height);
+            // moveShape can not only move element, but also resize it(it's only one
+            // correct way to resize)
+            this.avoidRouter.moveShape(this.avoidShapes[child.id].ref, newRectangle);
+            this.avoidShapes[child.id].bounds = Object.assign(Object.assign({}, this.avoidShapes[child.id].bounds), { width: child.bounds.width, height: child.bounds.height });
+            updateConnPinsOnShapeResize(child, this.avoidShapes[child.id], this.getAnchorComputer(child), Avoid);
+            if (!routesChanged) {
+                routesChanged = true;
+            }
+        }
+        return routesChanged;
+    }
+    handleNewShape(child, Avoid) {
+        // new shape
+        const centerPoint = getCenterPoint(child);
+        const rectangle = new Avoid.Rectangle(new Avoid.Point(centerPoint.x, centerPoint.y), child.bounds.width, child.bounds.height);
+        const shapeRef = new Avoid.ShapeRef(this.avoidRouter, rectangle);
+        const connPins = addConnectionPinsToShape(shapeRef, child, centerPoint, this.getAnchorComputer(child), Avoid);
+        this.avoidShapes[child.id] = {
+            ref: shapeRef,
+            bounds: Object.assign({}, child.bounds),
+            connPins,
+        };
     }
     destroy() {
         // TODO: explain need of calling destroy
@@ -359,7 +355,7 @@ class LibavoidRouter extends AbstractEdgeRouter {
                 handle.type = "routing-point";
                 points.splice(index + 1, 0, move.fromPosition || points[Math.max(index, 0)]);
                 edge.children.forEach((child) => {
-                    if (child instanceof SRoutingHandle &&
+                    if (child instanceof SRoutingHandleImpl &&
                         (child === handle || child.pointIndex > index))
                         child.pointIndex++;
                 });
@@ -440,6 +436,5 @@ class LibavoidRouter extends AbstractEdgeRouter {
         return { segmentStart, segmentEnd, lambda };
     }
 }
-LibavoidRouter.KIND = "libavoid";
-export { LibavoidRouter };
+LibavoidRouter.KIND = libavoidRouterKind;
 //# sourceMappingURL=libavoid-router.js.map
