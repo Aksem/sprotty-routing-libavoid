@@ -13,7 +13,6 @@ import {
   SConnectableElementImpl,
   SParentElementImpl,
   connectableFeature,
-  SShapeElementImpl
 } from "sprotty";
 import { Point, Bounds, centerOfLine } from "sprotty-protocol";
 import {
