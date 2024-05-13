@@ -1,5 +1,5 @@
 import { AvoidLib } from "libavoid-js";
-import { SRoutingHandleImpl, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElementImpl, SParentElementImpl, connectableFeature } from "sprotty";
+import { SRoutingHandleImpl, EdgeRouting, AbstractEdgeRouter, isBoundsAware, SConnectableElementImpl, SParentElementImpl, connectableFeature, } from "sprotty";
 import { Point, centerOfLine } from "sprotty-protocol";
 import { RouteType, Directions, libavoidRouterKind, } from "./libavoid-router-options";
 import { LibavoidEdge } from "./libavoid-edge";
