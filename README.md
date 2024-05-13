@@ -7,7 +7,7 @@
 
 **Supported Sprotty versions:**
 
-- sprotty 1.0: 1.2.* version
+- sprotty ^1.0(1.0.*, 1.1.*, 1.2.*, ...): 1.3.* version
 - sprotty 0.11-0.13: 1.0.* version
 
 ## 📦 Getting Started
