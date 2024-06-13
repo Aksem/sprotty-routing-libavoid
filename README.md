@@ -81,6 +81,8 @@
     });
     ```
 
+If you face with any problems, check also [libavoid-js FAQ](https://github.com/Aksem/libavoid-js#faq) .
+
 ## Known limitations
 
 - if AnchorComputer returns anchors on sides of connectables on first rendering, then anchors are attached to sides of connectables
