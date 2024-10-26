@@ -94,3 +94,12 @@ If you face with any problems, check also [libavoid-js FAQ](https://github.com/A
 Notes:
 
 - inversify [requires `reflect-metadata` and experimentalDecorators, emitDecoratorMetadata, types and lib compilation options in tsconfig.json](https://inversify.io/). Esbuild doesn't take these parameters(at least some of them) from tsconfig, because build created with esbuild doesn't work properly(injected classes cannot be resolved), that's why we still use tsc.
+
+
+## History
+
+This project was started as part of a research project at [Technische Universität Wien](https://www.tuwien.at) and is further developed by its author and contributors.
+
+<a href="https://www.tuwien.at">
+  <img src="https://raw.githubusercontent.com/Aksem/sprotty-routing-libavoid/refs/heads/master/docs/assets/TU_Logo_schwarz_RGB.svg" width="200" alt="Technische Universität Wien Logo" />
+</a>
