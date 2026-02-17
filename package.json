@@ -1,6 +1,6 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,8 +22,8 @@
     "url": "https://github.com/Aksem/sprotty-routing-libavoid"
   },
   "devDependencies": {
-    "@team-griffin/install-self-peers": "^1.1.1",
-    "esbuild": "^0.17.19",
+    "@team-griffin/install-self-peers": "^1.1.0",
+    "esbuild": "^0.27.3",
     "eslint": "^8.41.0",
     "prettier": "^2.8.8",
     "typescript": "^5.0.4"
@@ -32,7 +32,7 @@
     "libavoid-js": "^0.4.0-beta.1"
   },
   "peerDependencies": {
-    "inversify": "~6.0.2",
+    "inversify": "^6.0.2",
     "reflect-metadata": "^0.1.13",
     "sprotty": "^1.0.0",
     "sprotty-protocol": "^1.0.0"
