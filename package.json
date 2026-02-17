@@ -1,6 +1,6 @@
 {
   "name": "sprotty-routing-libavoid",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Libavoid-based routing feature for sprotty",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,7 +33,7 @@
   },
   "peerDependencies": {
     "inversify": "^6.0.2",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": ">=0.1.13",
     "sprotty": "^1.0.0",
     "sprotty-protocol": "^1.0.0"
   },
